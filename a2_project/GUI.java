@@ -25,12 +25,14 @@
 package a2_project;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
@@ -49,10 +51,21 @@ import javafx.stage.Stage;
 public class GUI extends Application {
 
 	private final String Title = "Milk Weights";
+	private Image startImage = new Image("start.jpeg");
+	private BackgroundImage backgroundImage = new BackgroundImage(startImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
+	private Background background = new Background(backgroundImage);
+	private Button exit = new Button("Exit");
+	private Button menu = new Button("Menu");
+	private HBox bottom = new HBox();
+	private final String MONTHS[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
+	private final ComboBox COMBO_MONTHS = new ComboBox(FXCollections.observableArrayList(MONTHS));
 	
 	@Override
 	public void start(Stage stage) throws Exception {
 		Scene start = SceneOne(stage);
+		bottom.getChildren().addAll(menu,exit);
+		bottom.setSpacing(725);
+		bottom.setAlignment(Pos.CENTER);
 		stage.setScene(start);
 		stage.show();
 	}
@@ -62,21 +75,19 @@ public class GUI extends Application {
 		BorderPane start = new BorderPane();
 		start.setPadding(new Insets(20, 20, 20, 20));
 		Scene scene = new Scene(start, 900, 650);
-		Image startImage = new Image("start.jpeg");
-		BackgroundImage backgroundImage = new BackgroundImage(startImage, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
-		Background background = new Background(backgroundImage);
 		start.setBackground(background);
-		Button exit = new Button("Exit");
 		exit.setStyle("-fx-font-size: 13pt;");
-		Button addData = new Button("Add Data");
-		Button removeData = new Button("Remove Data");
+		menu.setStyle("-fx-font-size: 13pt;");
+		exit.setMinWidth(70);
+		menu.setMinWidth(70);
+		menu.setVisible(false);
 		Button browse = new Button("Browse...");
 		Button save = new Button("Save");
 		Button reports = new Button("Reports");
 		Button modify = new Button("Add/Edit/Remove");
-		modify.setMinWidth(100);
+		modify.setMinWidth(120);
 		reports.setStyle("-fx-font-size: 11pt;");
-		reports.setMinWidth(100);
+		reports.setMinWidth(120);
 		reports.setDisable(true);
 		modify.setDisable(true);
 		Label startLabel = new Label("Welcome");
@@ -93,7 +104,7 @@ public class GUI extends Application {
 		Label csvError = new Label("No File or invalid file type!");
 		csvError.setTextFill(Color.RED);
 		csvError.setVisible(false);
-		TextField textField = new TextField ();
+		TextField textField = new TextField();
 		HBox mid = new HBox();
 		mid.getChildren().addAll(filepath, textField, browse);
 		mid.setSpacing(10);
@@ -106,7 +117,6 @@ public class GUI extends Application {
 		VBox left = new VBox();
 		VBox center = new VBox();
 		VBox right = new VBox();
-		HBox bottom = new HBox();
 		left.getChildren().add(reports);
 		left.setAlignment(Pos.CENTER);
 		right.getChildren().add(modify);
@@ -116,8 +126,6 @@ public class GUI extends Application {
 		top.getChildren().add(startLabel);
 		top.setAlignment(Pos.CENTER_LEFT);
 		center.setAlignment(Pos.CENTER.TOP_CENTER);
-		bottom.getChildren().add(exit);
-		bottom.setAlignment(Pos.BASELINE_RIGHT);
 		EventHandler<ActionEvent> browsweEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				textField.setText(file.showOpenDialog(stage).toString());
@@ -139,6 +147,12 @@ public class GUI extends Application {
 				stage.close();
 			}
 		};
+		EventHandler<ActionEvent> reportsEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				stage.setScene(sceneReport(stage));
+			}
+		};
+		reports.setOnAction(reportsEvent);
 		save.setOnAction(saveEvent);
 		browse.setOnAction(browsweEvent);
 		exit.setOnAction(exitEvent);
@@ -146,6 +160,63 @@ public class GUI extends Application {
 		start.setLeft(left);
 		start.setCenter(center);
 		start.setRight(right);
+		start.setBottom(bottom);
+		return scene;
+	}
+	
+	private Scene sceneReport(Stage stage) {
+		stage.setTitle(Title + "-Reports");
+		BorderPane start = new BorderPane();
+		start.setBackground(background);
+		start.setPadding(new Insets(20, 20, 20, 20));
+		Scene scene = new Scene(start, 900, 650);
+		Label farmReport = new Label("Farm Report");
+		farmReport.setStyle("-fx-font-size: 14pt;");
+		Label annualReport = new Label("Annual Report");
+		annualReport.setStyle("-fx-font-size: 14pt;");
+		Label farmLabel = new Label("Farm ID:");
+		TextField farmID = new TextField();
+		TextField year = new TextField();
+		year.setPrefWidth(240);
+		Label annualLabel = new Label("Year:");
+		farmID.setPrefWidth(110);
+		menu.setVisible(true);
+		COMBO_MONTHS.setPrefWidth(100);
+		Label label = new Label("Reports");
+		label.setStyle("-fx-font-size: 22pt;");
+		Button farmButton = new Button("Farm Report");
+		Button annualButton = new Button("Annual Report");
+		annualButton.setPrefWidth(105);
+		farmButton.setPrefWidth(105);
+		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				stage.setScene(SceneOne(stage));
+			}
+		};
+		menu.setOnAction(menuEvent);
+		VBox farmRep = new VBox();
+		HBox farm = new  HBox();
+		farm.getChildren().addAll(farmLabel, farmID, COMBO_MONTHS, farmButton);
+		farm.setSpacing(10);
+		farmRep.getChildren().addAll(farmReport, farm);
+		farmRep.setSpacing(20);
+		VBox annualRep = new VBox();
+		HBox annual = new HBox();
+		annual.getChildren().addAll(annualLabel, year, annualButton);
+		annual.setSpacing(10);
+		annualRep.getChildren().addAll(annualReport, annual);
+		annualRep.setSpacing(20);
+		HBox top = new HBox();
+		VBox left = new VBox();
+		VBox right = new VBox();
+		top.getChildren().add(label);
+		left.getChildren().addAll(farmRep, annualRep);
+		left.setAlignment(Pos.CENTER);
+		left.setAlignment(Pos.TOP_LEFT);
+		left.setSpacing(150);
+		top.setAlignment(Pos.CENTER_LEFT);
+		start.setTop(top);
+		start.setLeft(left);
 		start.setBottom(bottom);
 		return scene;
 	}
