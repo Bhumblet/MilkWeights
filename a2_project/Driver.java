@@ -25,6 +25,7 @@
  */
 package a2_project;
 
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 
@@ -37,18 +38,22 @@ public class Driver {
 
 	private double totalWeight;
 	private HashMap<String,Farm> data;
+	private File csv;
 	
 	public Driver() {
 		totalWeight = 0;
 		data = new HashMap<>();
 	}
 	
-	public Driver(String filepath) {
+	public Driver(String filepath) throws Exception {
 		importData(filepath);
 	}
 	
-	public void importData(String filepath) {
-		
+	public void importData(String filepath) throws Exception {
+		if(!filepath.substring(filepath.length()-4).equals(".csv")) {
+			throw new Exception();
+		}
+		csv = new File(filepath);
 	}
 	
 	public List<String> exportData() {

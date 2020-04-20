@@ -35,6 +35,8 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
@@ -60,6 +62,7 @@ public class GUI extends Application {
 	private HBox bottom = new HBox();
 	private final String MONTHS[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 	private final ComboBox COMBO_MONTHS = new ComboBox(FXCollections.observableArrayList(MONTHS));
+	private Driver currentInfo;
 	
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -136,12 +139,15 @@ public class GUI extends Application {
 		};
 		EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				/*if(invalid file) {
-					csvError.setVisible(true);*/
-				saved.setVisible(true);
-				csvError.setVisible(false);
-				reports.setDisable(false);
-				modify.setDisable(false);
+				try {
+					currentInfo = new Driver(textField.getText());
+					saved.setVisible(true);
+					csvError.setVisible(false);
+					reports.setDisable(false);
+					modify.setDisable(false);
+				} catch(Exception t) {
+					csvError.setVisible(true);
+				}
 			}
 		};
 		EventHandler<ActionEvent> exitEvent = new EventHandler<ActionEvent>() {
@@ -193,6 +199,9 @@ public class GUI extends Application {
 		Label monthlyLabel = new Label("Year:");
 		Label to = new Label("to");
 		Label dateLabel = new Label("Range:");
+		Label farmError = new Label("No ID/Year input or invalid input!");
+		farmError.setVisible(false);
+		farmError.setTextFill(Color.RED);
 		farmID.setPrefWidth(110);
 		menu.setVisible(true);
 		COMBO_MONTHS.setPrefWidth(112);
@@ -213,12 +222,26 @@ public class GUI extends Application {
 				stage.setScene(SceneOne(stage));
 			}
 		};
+		EventHandler<ActionEvent> farmEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				String farmString = farmID.getText();
+				String yearString = yearFarm.getText();
+				try {
+					int farmInt = Integer.parseInt(farmString);
+					int yearInt = Integer.parseInt(yearString);
+					stage.setScene(farmReport(stage, farmString, yearString));
+				} catch(Exception t) {
+					farmError.setVisible(true);
+				}
+			}
+		};
 		menu.setOnAction(menuEvent);
+		farmButton.setOnAction(farmEvent);
 		VBox farmRep = new VBox();
 		HBox farm = new  HBox();
 		farm.getChildren().addAll(farmLabel, farmID, yearFarm, farmButton);
 		farm.setSpacing(10);
-		farmRep.getChildren().addAll(farmReport, farm);
+		farmRep.getChildren().addAll(farmReport, farm, farmError);
 		farmRep.setSpacing(20);
 		VBox annualRep = new VBox();
 		HBox annual = new HBox();
@@ -254,6 +277,37 @@ public class GUI extends Application {
 		start.setRight(right);
 		start.setBottom(bottom);
 		return scene;
+	}
+	
+	private Scene farmReport(Stage stage, String farmID, String year) {
+		stage.setTitle(Title + "-Farm Report");
+		BorderPane start = new BorderPane();
+		start.setBackground(background);
+		start.setPadding(new Insets(20, 20, 20, 20));
+		Scene scene = new Scene(start, 900, 650);
+		Label label = new Label("Farm Report");
+		label.setStyle("-fx-font-size: 22pt;");
+		Label farm = new Label("Farm ID: " + farmID + " Year: " + year);
+		TableView table = new TableView();
+		TableColumn firstCol = new TableColumn("Month");
+	    TableColumn secondCol = new TableColumn("Milk Weight");
+	    TableColumn lastCol = new TableColumn("Month %");
+	    firstCol.setPrefWidth(200);
+	    secondCol.setPrefWidth(200);
+	    lastCol.setPrefWidth(200);
+	    table.getColumns().addAll(firstCol, secondCol, lastCol);
+	    table.setPrefWidth(300);
+		HBox top = new HBox();
+		VBox center = new VBox();
+		center.getChildren().addAll(farm, table);
+		center.setPrefWidth(600);
+		top.getChildren().add(label);
+		top.setAlignment(Pos.CENTER_LEFT);
+		start.setTop(top);
+		start.setCenter(center);
+		start.setBottom(bottom);
+		return scene;
+		
 	}
 	public static void main(String[] args) {
 		launch(args);
