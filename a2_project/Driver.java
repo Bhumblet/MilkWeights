@@ -76,6 +76,9 @@ public class Driver {
 		return null;
 	}
 	
+	public String getFileName() {
+		return csv.getName();
+	}
 	/**
 	 * @param args
 	 */

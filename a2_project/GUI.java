@@ -160,6 +160,12 @@ public class GUI extends Application {
 				stage.setScene(sceneReport(stage));
 			}
 		};
+		EventHandler<ActionEvent> modifyEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				stage.setScene(modify(stage));
+			}
+		};
+		modify.setOnAction(modifyEvent);
 		reports.setOnAction(reportsEvent);
 		save.setOnAction(saveEvent);
 		browse.setOnAction(browsweEvent);
@@ -219,6 +225,7 @@ public class GUI extends Application {
 		farmButton.setPrefWidth(105);
 		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
+				currentInfo = null;
 				stage.setScene(SceneOne(stage));
 			}
 		};
@@ -288,19 +295,78 @@ public class GUI extends Application {
 		Label label = new Label("Farm Report");
 		label.setStyle("-fx-font-size: 22pt;");
 		Label farm = new Label("Farm ID: " + farmID + " Year: " + year);
+		farm.setStyle("-fx-font-size: 12pt;");
 		TableView table = new TableView();
 		TableColumn firstCol = new TableColumn("Month");
 	    TableColumn secondCol = new TableColumn("Milk Weight");
 	    TableColumn lastCol = new TableColumn("Month %");
-	    firstCol.setPrefWidth(200);
-	    secondCol.setPrefWidth(200);
-	    lastCol.setPrefWidth(200);
+	    firstCol.setPrefWidth(250);
+	    secondCol.setPrefWidth(250);
+	    lastCol.setPrefWidth(250);
 	    table.getColumns().addAll(firstCol, secondCol, lastCol);
-	    table.setPrefWidth(300);
+	    table.setMaxWidth(750);
 		HBox top = new HBox();
 		VBox center = new VBox();
 		center.getChildren().addAll(farm, table);
 		center.setPrefWidth(600);
+		center.setAlignment(Pos.TOP_CENTER);
+		top.getChildren().add(label);
+		top.setAlignment(Pos.CENTER_LEFT);
+		start.setTop(top);
+		start.setCenter(center);
+		start.setBottom(bottom);
+		return scene;
+		
+	}
+	
+	private Scene modify(Stage stage) {
+		stage.setTitle(Title + "-Modify");
+		BorderPane start = new BorderPane();
+		start.setBackground(background);
+		start.setPadding(new Insets(20, 20, 20, 20));
+		Scene scene = new Scene(start, 900, 650);
+		Label label = new Label("Add/Edit/Remove");
+		label.setStyle("-fx-font-size: 22pt;");
+		Label file = new Label("File: " + currentInfo.getFileName());
+		file.setStyle("-fx-font-size: 12pt;");
+		menu.setVisible(true);
+		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				currentInfo = null;
+				stage.setScene(SceneOne(stage));
+			}
+		};
+		menu.setOnAction(menuEvent);
+		TableView table = new TableView();
+		TableColumn firstCol = new TableColumn("Date");
+	    TableColumn secondCol = new TableColumn("Farm ID");
+	    TableColumn lastCol = new TableColumn("Weight");
+	    firstCol.setPrefWidth(250);
+	    secondCol.setPrefWidth(250);
+	    lastCol.setPrefWidth(250);
+	    table.getColumns().addAll(firstCol, secondCol, lastCol);
+	    table.setEditable(true);
+	    table.setMaxWidth(750);
+	    DatePicker date = new DatePicker();
+	    date.setPromptText("Date");
+	    TextField ID = new TextField();
+	    ID.setPromptText("Farm ID");
+	    TextField weight = new TextField();
+	    weight.setPromptText("Weight");
+	    Button add = new Button("Add");
+	    Button remove = new Button("Remove");
+	    add.setPrefWidth(90);
+	    remove.setPrefWidth(90);
+		HBox top = new HBox();
+		HBox mod = new HBox();
+		mod.getChildren().addAll(date, ID, weight, add, remove);
+		mod.setSpacing(10);
+		mod.setAlignment(Pos.CENTER);
+		VBox center = new VBox();
+		center.getChildren().addAll(file, table, mod);
+		center.setPrefWidth(600);
+		center.setAlignment(Pos.TOP_CENTER);
+		center.setSpacing(20);
 		top.getChildren().add(label);
 		top.setAlignment(Pos.CENTER_LEFT);
 		start.setTop(top);
