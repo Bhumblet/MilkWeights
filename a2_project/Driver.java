@@ -28,6 +28,9 @@ package a2_project;
 import java.io.File;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.Map.Entry;
 
 /**
  * Driver - TODO Describe purpose of this user-defined type
@@ -54,6 +57,29 @@ public class Driver {
 			throw new Exception();
 		}
 		csv = new File(filepath);
+		Scanner scan=new Scanner(csv);
+		scan.useDelimiter(",");
+		while(scan.hasNext()) {
+			ArrayList<String> points=new ArrayList<String>();
+			points.add(scan.next());
+			if(points.size()==3) {
+				int year=Integer.parseInt(points.get(0).substring(0,4));
+				int month=Integer.parseInt(points.get(0).substring(5,5));
+				String day=points.get(0).substring(7,7);
+				String id=points.get(1).substring(5);
+				if(!data.containsValue(id))
+					data.put(id,new Farm(id));
+				double weight=Double.parseDouble(points.get(2));
+				Farm f=null;
+				for(Entry<String,Farm> entry:data.entrySet()) {
+					if(entry.getValue().getID().equals(id))
+						f=entry.getValue();
+				}
+				
+				data.replace(id,f);
+			}
+		}
+		scan.close();
 	}
 	
 	public List<String> exportData() {

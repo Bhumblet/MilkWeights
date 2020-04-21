@@ -48,7 +48,12 @@ public class YearWeight {
 	}
 	
 	public double getTotalYearWeight() {
-		return this.totalYearWeight;
+		totalYearWeight=0;
+		for(int i=0;i<monthlyWeight.length;i++) {
+			if(monthlyWeight[i]!=null)
+			totalYearWeight+=monthlyWeight[i].getTotalMonthWeight();
+		}
+		return totalYearWeight;
 	}
 	
 	public void setMonthlyWeight(int index, double value) {

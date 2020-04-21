@@ -48,7 +48,12 @@ public class MonthWeight {
 	}
 	
 	public double getTotalMonthWeight() {
-		return this.totalMonthWeight;
+		totalMonthWeight=0;
+		for(int i=0;i<dailyWeight.length;i++) {
+			if(dailyWeight[i]!=null)
+				totalMonthWeight+=dailyWeight[i].getTotalDayWeight();
+		}
+		return totalMonthWeight;
 	}
 
 	public void setDailyWeight(int index, double value) {

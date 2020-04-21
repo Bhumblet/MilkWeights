@@ -51,7 +51,12 @@ public class Farm {
 	}
 	
 	public double getTotalFarmWeight() {
-		return this.totalFarmWeight;
+		totalFarmWeight=0;
+		for(int i=0;i<yearlyWeight.size();i++) {
+			if(yearlyWeight.get(i)!=null)
+				totalFarmWeight+=yearlyWeight.get(i).getTotalYearWeight();
+		}
+		return totalFarmWeight;
 	}
 	
 	public void setYearlyWeight(int year, double value) {
