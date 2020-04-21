@@ -63,11 +63,11 @@ public class Driver {
 			ArrayList<String> points=new ArrayList<String>();
 			points.add(scan.next());
 			if(points.size()==3) {
-				int year=Integer.parseInt(points.get(0).substring(0,4));
-				int month=Integer.parseInt(points.get(0).substring(5,5));
+				String year=points.get(0).substring(0,4);
+				String month=points.get(0).substring(5,5);
 				String day=points.get(0).substring(7,7);
 				String id=points.get(1).substring(5);
-				if(!data.containsValue(id))
+				if(!data.containsKey(id))
 					data.put(id,new Farm(id));
 				double weight=Double.parseDouble(points.get(2));
 				Farm f=null;
