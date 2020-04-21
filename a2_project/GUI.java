@@ -24,8 +24,13 @@
  */
 package a2_project;
 
+import java.time.format.DateTimeFormatter;
+
+import a2_project.GUI.modifyTable;
 import javafx.application.Application;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -38,6 +43,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.Image;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundImage;
@@ -59,6 +66,7 @@ public class GUI extends Application {
 	private Background background = new Background(backgroundImage);
 	private Button exit = new Button("Exit");
 	private Button menu = new Button("Menu");
+	private Button save = new Button("Save");
 	private HBox bottom = new HBox();
 	private final String MONTHS[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 	private final ComboBox COMBO_MONTHS = new ComboBox(FXCollections.observableArrayList(MONTHS));
@@ -67,8 +75,8 @@ public class GUI extends Application {
 	@Override
 	public void start(Stage stage) throws Exception {
 		Scene start = SceneOne(stage);
-		bottom.getChildren().addAll(menu,exit);
-		bottom.setSpacing(725);
+		bottom.getChildren().addAll(menu, save, exit);
+		bottom.setSpacing(327.5);
 		bottom.setAlignment(Pos.CENTER);
 		COMBO_MONTHS.setPromptText("Month");
 		stage.setScene(start);
@@ -83,9 +91,12 @@ public class GUI extends Application {
 		start.setBackground(background);
 		exit.setStyle("-fx-font-size: 13pt;");
 		menu.setStyle("-fx-font-size: 13pt;");
+		save.setStyle("-fx-font-size: 13pt;");
 		exit.setMinWidth(70);
+		save.setMinWidth(70);
 		menu.setMinWidth(70);
 		menu.setVisible(false);
+		save.setVisible(false);
 		Button browse = new Button("Browse...");
 		Button save = new Button("Save");
 		Button reports = new Button("Reports");
@@ -304,7 +315,19 @@ public class GUI extends Application {
 	    secondCol.setPrefWidth(250);
 	    lastCol.setPrefWidth(250);
 	    table.getColumns().addAll(firstCol, secondCol, lastCol);
-	    table.setMaxWidth(750);
+	    table.setMaxWidth(752);
+	    firstCol.setCellValueFactory(
+	    	 new PropertyValueFactory<farmTable,String>("month")
+	    );
+	    	secondCol.setCellValueFactory(
+	    	    new PropertyValueFactory<farmTable,String>("milkWeight")
+	    	);
+	    	lastCol.setCellValueFactory(
+	    	    new PropertyValueFactory<farmTable,String>("percentage")
+	    	);
+	    table.setItems(farmData);
+	    table.setEditable(true);
+	    table.setMaxHeight(330);
 		HBox top = new HBox();
 		VBox center = new VBox();
 		center.getChildren().addAll(farm, table);
@@ -330,6 +353,7 @@ public class GUI extends Application {
 		Label file = new Label("File: " + currentInfo.getFileName());
 		file.setStyle("-fx-font-size: 12pt;");
 		menu.setVisible(true);
+		save.setVisible(true);
 		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				currentInfo = null;
@@ -337,7 +361,7 @@ public class GUI extends Application {
 			}
 		};
 		menu.setOnAction(menuEvent);
-		TableView table = new TableView();
+		TableView<modifyTable> table = new TableView<modifyTable>();
 		TableColumn firstCol = new TableColumn("Date");
 	    TableColumn secondCol = new TableColumn("Farm ID");
 	    TableColumn lastCol = new TableColumn("Weight");
@@ -346,24 +370,63 @@ public class GUI extends Application {
 	    lastCol.setPrefWidth(250);
 	    table.getColumns().addAll(firstCol, secondCol, lastCol);
 	    table.setEditable(true);
-	    table.setMaxWidth(750);
+	    table.setMaxWidth(770);
+	    firstCol.setCellValueFactory(
+		    	 new PropertyValueFactory<farmTable,String>("date")
+		    );
+		    	secondCol.setCellValueFactory(
+		    	    new PropertyValueFactory<farmTable,String>("farmID")
+		    	);
+		    	lastCol.setCellValueFactory(
+		    	    new PropertyValueFactory<farmTable,String>("weight")
+		    	);
+	    table.setItems(modifyData);
 	    DatePicker date = new DatePicker();
 	    date.setPromptText("Date");
 	    TextField ID = new TextField();
 	    ID.setPromptText("Farm ID");
 	    TextField weight = new TextField();
+	    Label error = new Label("No input or invalid input!");
+	    error.setTextFill(Color.RED);
+	    error.setVisible(false);
 	    weight.setPromptText("Weight");
 	    Button add = new Button("Add");
 	    Button remove = new Button("Remove");
-	    add.setPrefWidth(90);
-	    remove.setPrefWidth(90);
+	    add.setPrefWidth(101);
+	    remove.setPrefWidth(101);
+	    EventHandler<ActionEvent> addEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				if(date.getValue() != null && !ID.getText().equals("") && !weight.getText().equals("")) {
+					error.setVisible(false);
+					String dateText = date.getEditor().getText();
+					dateText = (dateText.substring(0, dateText.length()-4)) + dateText.substring(dateText.length()-2);
+					modifyData.add(new modifyTable(dateText,ID.getText(),weight.getText()));
+					date.setValue(null);
+					ID.clear();
+					weight.clear();
+				}else {
+					error.setVisible(true);
+				}
+			}
+		};
+		EventHandler<ActionEvent> removeEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				modifyTable selected = table.getSelectionModel().getSelectedItem();
+				table.getItems().remove(selected);
+			}
+		};
+		firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		lastCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		remove.setOnAction(removeEvent);
+		add.setOnAction(addEvent);
 		HBox top = new HBox();
 		HBox mod = new HBox();
 		mod.getChildren().addAll(date, ID, weight, add, remove);
 		mod.setSpacing(10);
 		mod.setAlignment(Pos.CENTER);
 		VBox center = new VBox();
-		center.getChildren().addAll(file, table, mod);
+		center.getChildren().addAll(file, table, mod, error);
 		center.setPrefWidth(600);
 		center.setAlignment(Pos.TOP_CENTER);
 		center.setSpacing(20);
@@ -375,8 +438,108 @@ public class GUI extends Application {
 		return scene;
 		
 	}
-	public static void main(String[] args) {
-		launch(args);
-	}
+	private final ObservableList<farmTable> farmData =
+	        FXCollections.observableArrayList(
+	            new farmTable("January", "996", "6.6"),
+	            new farmTable("February", "1375", "9.0"),
+	            new farmTable("March", "1131", "7.4"),
+	            new farmTable("April", "662", "4.4"),
+	            new farmTable("May", "1147", "7.6"),
+	            new farmTable("June", "1886", "12.4"),
+	            new farmTable("July", "1081", "7.1"),
+	            new farmTable("August", "1492", "9.8"),
+	            new farmTable("September", "768", "5.0"),
+	            new farmTable("October", "1593", "10.5"),
+	            new farmTable("November", "1346", "8.9"),
+	            new farmTable("December", "1713", "11.3")
+	        );
+	public static class farmTable {
+		 
+        private final SimpleStringProperty month;
+        private final SimpleStringProperty milkWeight;
+        private final SimpleStringProperty percentage;
+ 
+        private farmTable(String month, String milkweight, String percentage) {
+            this.month = new SimpleStringProperty(month);
+            this.milkWeight = new SimpleStringProperty(milkweight);
+            this.percentage = new SimpleStringProperty(percentage);
+        }
+ 
+        public String getMonth() {
+            return month.get();
+        }
+ 
+        public void setMonth(String month) {
+            this.month.set(month);
+        }
+ 
+        public String getMilkWeight() {
+            return milkWeight.get();
+        }
+ 
+        public void setMilkWeight(String milkWeight) {
+            this.milkWeight.set(milkWeight);
+        }
+ 
+        public String getPercentage() {
+            return percentage.get();
+        }
+ 
+        public void setEmail(String percentage) {
+            this.percentage.set(percentage);
+        }
+    }
+	private final ObservableList<modifyTable> modifyData =
+	        FXCollections.observableArrayList(
+	            new modifyTable("1/1/20", "01", "1359"),
+	            new modifyTable("1/2/20", "02", "393"),
+	            new modifyTable("1/3/20", "01", "323"),
+	            new modifyTable("1/4/20", "03", "134"),
+	            new modifyTable("1/5/20", "02", "456"),
+	            new modifyTable("1/6/20", "04", "1256"),
+	            new modifyTable("1/7/20", "01", "124"),
+	            new modifyTable("1/8/20", "03", "1245"),
+	            new modifyTable("1/9/20", "02", "56"),
+	            new modifyTable("1/10/20", "01", "174"),
+	            new modifyTable("1/11/20", "04", "256"),
+	            new modifyTable("1/12/20", "03", "123")
+	        );
+	public static class modifyTable {
+		 
+        private final SimpleStringProperty date;
+        private final SimpleStringProperty farmID;
+        private final SimpleStringProperty weight;
+ 
+        public modifyTable(String date, String farmID, String weight) {
+            this.date = new SimpleStringProperty(date);
+            this.farmID = new SimpleStringProperty(farmID);
+            this.weight = new SimpleStringProperty(weight);
+        }
+ 
+        public String getDate() {
+            return date.get();
+        }
+ 
+        public void setDate(String date) {
+            this.date.set(date);
+        }
+ 
+        public String getFarmID() {
+            return farmID.get();
+        }
+ 
+        public void setFarmID(String farmID) {
+            this.farmID.set(farmID);
+        }
+ 
+        public String getWeight() {
+            return weight.get();
+        }
+ 
+        public void setWeight(String weight) {
+            this.weight.set(weight);
+        }
+    }
+	
 
 }
