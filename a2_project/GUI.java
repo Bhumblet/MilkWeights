@@ -24,7 +24,14 @@
  */
 package a2_project;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.time.format.DateTimeFormatter;
+import java.util.LinkedList;
+import java.util.List;
 
 import a2_project.GUI.modifyTable;
 import javafx.application.Application;
@@ -71,6 +78,7 @@ public class GUI extends Application {
 	private final String MONTHS[] = { "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" };
 	private final ComboBox COMBO_MONTHS = new ComboBox(FXCollections.observableArrayList(MONTHS));
 	private Driver currentInfo;
+	private List<File> files = new LinkedList<File>();
 	
 	@Override
 	public void start(Stage stage) throws Exception {
@@ -98,7 +106,6 @@ public class GUI extends Application {
 		menu.setVisible(false);
 		save.setVisible(false);
 		Button browse = new Button("Browse...");
-		Button save = new Button("Save");
 		Button reports = new Button("Reports");
 		Button modify = new Button("Add/Edit/Remove");
 		modify.setMinWidth(120);
@@ -108,7 +115,8 @@ public class GUI extends Application {
 		modify.setDisable(true);
 		Label startLabel = new Label("Welcome");
 		Label saved = new Label("Saved!");
-		Label selectFile = new Label("Select Input");
+		Label selectFile = new Label("Select File(s)");
+		Label numberFiles = new Label("Number of Files: 0");
 		selectFile.setStyle("-fx-font-size: 14pt;");
 		saved.setTextFill(Color.GREEN);
 		saved.setStyle("-fx-font-size: 14pt;");
@@ -126,7 +134,7 @@ public class GUI extends Application {
 		mid.setSpacing(10);
 		mid.setAlignment(Pos.CENTER);
 		HBox midTwo = new HBox();
-		midTwo.getChildren().addAll(save, saved);
+		midTwo.getChildren().addAll(numberFiles, saved);
 		midTwo.setSpacing(10);
 		midTwo.setAlignment(Pos.CENTER);
 		HBox top = new HBox();
@@ -144,23 +152,30 @@ public class GUI extends Application {
 		center.setAlignment(Pos.CENTER.TOP_CENTER);
 		EventHandler<ActionEvent> browsweEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				textField.setText(file.showOpenDialog(stage).toString());
-				save.fire();
-			}
-		};
-		EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent e) {
+				files.add(file.showOpenDialog(stage));
+				String path = files.get(files.size() - 1).getAbsolutePath();
 				try {
-					currentInfo = new Driver(textField.getText());
-					saved.setVisible(true);
+					if(!path.substring(path.length()-4).equals(".csv")) {
+						files.remove(files.size()-1);
+						throw new Exception();
+					}
 					csvError.setVisible(false);
+					saved.setVisible(true);
+					textField.setText(files.get(files.size()-1).getAbsolutePath());
+					numberFiles.setText("Number of Files: " + files.size());
 					reports.setDisable(false);
-					modify.setDisable(false);
+					if(files.size() > 0 && files.size() < 2) {
+						modify.setDisable(false);
+					}
+					else {
+						modify.setDisable(true);
+					}
 				} catch(Exception t) {
 					csvError.setVisible(true);
 				}
 			}
 		};
+		
 		EventHandler<ActionEvent> exitEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				stage.close();
@@ -168,17 +183,26 @@ public class GUI extends Application {
 		};
 		EventHandler<ActionEvent> reportsEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				stage.setScene(sceneReport(stage));
+				try {
+					stage.setScene(sceneReport(stage));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		};
 		EventHandler<ActionEvent> modifyEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				stage.setScene(modify(stage));
+				try {
+					stage.setScene(modify(stage));
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
 			}
 		};
 		modify.setOnAction(modifyEvent);
 		reports.setOnAction(reportsEvent);
-		save.setOnAction(saveEvent);
 		browse.setOnAction(browsweEvent);
 		exit.setOnAction(exitEvent);
 		start.setTop(top);
@@ -189,7 +213,8 @@ public class GUI extends Application {
 		return scene;
 	}
 	
-	private Scene sceneReport(Stage stage) {
+	private Scene sceneReport(Stage stage) throws Exception {
+		currentInfo = new Driver(files);
 		stage.setTitle(Title + "-Reports");
 		BorderPane start = new BorderPane();
 		start.setBackground(background);
@@ -216,7 +241,7 @@ public class GUI extends Application {
 		Label monthlyLabel = new Label("Year:");
 		Label to = new Label("to");
 		Label dateLabel = new Label("Range:");
-		Label farmError = new Label("No ID/Year input or invalid input!");
+		Label farmError = new Label("No matching ID/Year or invalid input!");
 		farmError.setVisible(false);
 		farmError.setTextFill(Color.RED);
 		farmID.setPrefWidth(110);
@@ -237,6 +262,7 @@ public class GUI extends Application {
 		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				currentInfo = null;
+				files = null;
 				stage.setScene(SceneOne(stage));
 			}
 		};
@@ -245,9 +271,13 @@ public class GUI extends Application {
 				String farmString = farmID.getText();
 				String yearString = yearFarm.getText();
 				try {
-					int farmInt = Integer.parseInt(farmString);
 					int yearInt = Integer.parseInt(yearString);
-					stage.setScene(farmReport(stage, farmString, yearString));
+					if(currentInfo.contains(farmString)) {
+						stage.setScene(farmReport(stage, farmString, yearString));
+					}
+					else {
+						farmError.setVisible(true);
+					}
 				} catch(Exception t) {
 					farmError.setVisible(true);
 				}
@@ -297,7 +327,7 @@ public class GUI extends Application {
 		return scene;
 	}
 	
-	private Scene farmReport(Stage stage, String farmID, String year) {
+	private Scene farmReport(Stage stage, String farmID, String year) throws Exception {
 		stage.setTitle(Title + "-Farm Report");
 		BorderPane start = new BorderPane();
 		start.setBackground(background);
@@ -342,13 +372,24 @@ public class GUI extends Application {
 		
 	}
 	
-	private Scene modify(Stage stage) {
+	private Scene modify(Stage stage) throws Exception {
+		currentInfo = new Driver(files);
+		List<LogObject> data = currentInfo.getModifyData();
+		for(int i = 0; i < data.size(); i++) {
+			LogObject current = data.get(i);
+			String[] date = current.getDate().split("-");
+			String dateFormated = date[1] + "/" + date[2] + "/" + date[0];
+			modifyData.add(new modifyTable(dateFormated, current.getID(), current.getWeight()));
+		}
 		stage.setTitle(Title + "-Modify");
 		BorderPane start = new BorderPane();
 		start.setBackground(background);
 		start.setPadding(new Insets(20, 20, 20, 20));
 		Scene scene = new Scene(start, 900, 650);
 		Label label = new Label("Add/Edit/Remove");
+		Label saved = new Label("Saved!");
+		saved.setVisible(false);;
+		saved.setTextFill(Color.GREEN);
 		label.setStyle("-fx-font-size: 22pt;");
 		Label file = new Label("File: " + currentInfo.getFileName());
 		file.setStyle("-fx-font-size: 12pt;");
@@ -357,6 +398,8 @@ public class GUI extends Application {
 		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				currentInfo = null;
+				files.clear();
+				modifyData.clear();
 				stage.setScene(SceneOne(stage));
 			}
 		};
@@ -371,6 +414,9 @@ public class GUI extends Application {
 	    table.getColumns().addAll(firstCol, secondCol, lastCol);
 	    table.setEditable(true);
 	    table.setMaxWidth(770);
+	    firstCol.setSortable(false);
+	    secondCol.setSortable(false);
+	    lastCol.setSortable(false);
 	    firstCol.setCellValueFactory(
 		    	 new PropertyValueFactory<farmTable,String>("date")
 		    );
@@ -399,7 +445,7 @@ public class GUI extends Application {
 				if(date.getValue() != null && !ID.getText().equals("") && !weight.getText().equals("")) {
 					error.setVisible(false);
 					String dateText = date.getEditor().getText();
-					dateText = (dateText.substring(0, dateText.length()-4)) + dateText.substring(dateText.length()-2);
+					//dateText = (dateText.substring(0, dateText.length()-4)) + dateText.substring(dateText.length()-2);
 					modifyData.add(new modifyTable(dateText,ID.getText(),weight.getText()));
 					date.setValue(null);
 					ID.clear();
@@ -415,9 +461,35 @@ public class GUI extends Application {
 				table.getItems().remove(selected);
 			}
 		};
+		EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				File file = files.get(0);
+				try {
+					PrintWriter print = new PrintWriter(file.getAbsolutePath());
+					print.print("");
+					print.close();
+					FileWriter writer = new FileWriter(file.getAbsoluteFile(), false);
+					BufferedWriter bWriter = new BufferedWriter(writer);
+					bWriter.write("date,farm_id,weight");
+					for(int i = 0; i < modifyData.size(); i++) {
+						bWriter.newLine();
+						String[] date = modifyData.get(i).getDate().split("/");
+						String ID = modifyData.get(i).getFarmID();
+						String weight = modifyData.get(i).getWeight();
+						String dateFormat = date[2] + "-" + date[0] + "-" + date[1];
+						bWriter.write(dateFormat + ",Farm " + ID + "," + weight);
+					}
+					bWriter.close();
+					saved.setVisible(true);
+				} catch (IOException e1) {
+					e1.printStackTrace();
+				}
+			}
+		};
 		firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		lastCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		save.setOnAction(saveEvent);
 		remove.setOnAction(removeEvent);
 		add.setOnAction(addEvent);
 		HBox top = new HBox();
@@ -426,7 +498,7 @@ public class GUI extends Application {
 		mod.setSpacing(10);
 		mod.setAlignment(Pos.CENTER);
 		VBox center = new VBox();
-		center.getChildren().addAll(file, table, mod, error);
+		center.getChildren().addAll(file, table, mod, error, saved);
 		center.setPrefWidth(600);
 		center.setAlignment(Pos.TOP_CENTER);
 		center.setSpacing(20);
@@ -491,18 +563,7 @@ public class GUI extends Application {
     }
 	private final ObservableList<modifyTable> modifyData =
 	        FXCollections.observableArrayList(
-	            new modifyTable("1/1/20", "01", "1359"),
-	            new modifyTable("1/2/20", "02", "393"),
-	            new modifyTable("1/3/20", "01", "323"),
-	            new modifyTable("1/4/20", "03", "134"),
-	            new modifyTable("1/5/20", "02", "456"),
-	            new modifyTable("1/6/20", "04", "1256"),
-	            new modifyTable("1/7/20", "01", "124"),
-	            new modifyTable("1/8/20", "03", "1245"),
-	            new modifyTable("1/9/20", "02", "56"),
-	            new modifyTable("1/10/20", "01", "174"),
-	            new modifyTable("1/11/20", "04", "256"),
-	            new modifyTable("1/12/20", "03", "123")
+	            
 	        );
 	public static class modifyTable {
 		 
@@ -541,5 +602,13 @@ public class GUI extends Application {
         }
     }
 	
+	/**
+	 * Main method to run gui made from JavaFX
+	 * 
+	 * @param args
+	 */
+	public static void main(String[] args) {
+		launch(args);
 
+	}
 }

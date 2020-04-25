@@ -27,6 +27,7 @@ package a2_project;
 
 import java.io.File;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.ArrayList;
@@ -40,19 +41,49 @@ import java.util.Map.Entry;
 public class Driver {
 
 	private double totalWeight;
-	private HashMap<String,Farm> data;
-	private File csv;
+	private List<LinkedList<LogObject>> farmSorted;
+	private List<File> files;
 	
-	public Driver() {
-		totalWeight = 0;
-		data = new HashMap<>();
+	public Driver(List<File> files) throws Exception {
+		farmSorted = new LinkedList<LinkedList<LogObject>>();
+		this.files = files;
+		for(int i = 0; i < files.size(); i++) {
+			Scanner scan = new Scanner(files.get(i));
+			while(scan.hasNext()) {
+				String info = scan.nextLine();
+				String[] seperated = new String[3];
+				seperated = info.split(",");
+				seperated[1] = seperated[1].substring(5);
+				LogObject current = new LogObject(seperated[0], seperated[1], seperated[2]);
+				if(!seperated[0].equals("date")) {
+					if(!farmSorted.isEmpty()) {
+						for(int n = 0; n < farmSorted.size(); n++) {
+							if(current != null && current.compare(farmSorted.get(n).get(0))) {
+								farmSorted.get(n).add(current);
+								current = null;
+							}
+						}
+					}
+					if(current != null) {
+						LinkedList<LogObject> temp = new LinkedList<LogObject>();
+						temp.add(current);
+						farmSorted.add(temp);
+					}
+				}
+			}
+			scan.close();
+		}
 	}
 	
-	public Driver(String filepath) throws Exception {
-		importData(filepath);
+	public boolean contains(String ID) {
+		for(int i = 0; i < farmSorted.size(); i++) {
+			if(Integer.parseInt(farmSorted.get(i).get(0).getID()) == Integer.parseInt(ID)){
+				return true;
+			}
+		}
+		return false;
 	}
-	
-	public void importData(String filepath) throws Exception {
+	/*public void importData(String filepath) throws Exception {
 		if(!filepath.substring(filepath.length()-4).equals(".csv")) {
 			throw new Exception();
 		}
@@ -80,12 +111,20 @@ public class Driver {
 			}
 		}
 		scan.close();
-	}
+	}*/
 	
 	public List<String> exportData() {
 		return null;
 	}
-	
+	public List<LogObject> getModifyData(){
+		List<LogObject> list = new LinkedList<LogObject>();
+		for(int i = 0; i < farmSorted.size(); i++) {
+			for(int n = 0; n < farmSorted.get(i).size(); n++) {
+				list.add(farmSorted.get(i).get(n));
+			}
+		}
+		return list;
+	}
 	public List<String> getFarmReport(){
 		return null;
 	}
@@ -103,7 +142,7 @@ public class Driver {
 	}
 	
 	public String getFileName() {
-		return csv.getName();
+		return files.get(0).getName().toString();
 	}
 	/**
 	 * @param args
