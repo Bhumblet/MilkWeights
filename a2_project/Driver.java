@@ -75,10 +75,15 @@ public class Driver {
 		}
 	}
 	
-	public boolean contains(String ID) {
+	public boolean contains(String ID, String year) {
 		for(int i = 0; i < farmSorted.size(); i++) {
 			if(Integer.parseInt(farmSorted.get(i).get(0).getID()) == Integer.parseInt(ID)){
-				return true;
+				for(int n = 0; n < farmSorted.get(i).size(); n++) {
+					String farm = farmSorted.get(i).get(n).getDate();
+					if(Integer.parseInt(farm.substring(0,4)) == Integer.parseInt(year)){
+						return true;
+					}
+				}
 			}
 		}
 		return false;
@@ -116,7 +121,7 @@ public class Driver {
 	public List<String> exportData() {
 		return null;
 	}
-	public List<LogObject> getModifyData(){
+	public List<LogObject> getModifyReport(){
 		List<LogObject> list = new LinkedList<LogObject>();
 		for(int i = 0; i < farmSorted.size(); i++) {
 			for(int n = 0; n < farmSorted.get(i).size(); n++) {
@@ -124,6 +129,15 @@ public class Driver {
 			}
 		}
 		return list;
+	}
+	
+	public List<LogObject> getSpecificFarm(String ID){
+		for(int i = 0; i < farmSorted.size(); i++) {
+			if(farmSorted.get(i).get(0).getID().equals(ID)) {
+				return farmSorted.get(i);
+			}
+		}
+		return null;	
 	}
 	public List<String> getFarmReport(){
 		return null;

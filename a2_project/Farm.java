@@ -26,6 +26,7 @@
 package a2_project;
 
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * Farm - TODO Describe purpose of this user-defined type
@@ -35,44 +36,54 @@ import java.util.HashMap;
 public class Farm {
 
 	private String ID;
-	private double totalFarmWeight;
-	private HashMap<Integer,YearWeight> yearlyWeight;
+	private List<LogObject> farmData;
 	/**
 	 * @param args
 	 */
-	public Farm(String ID) {
-		this.ID = ID;
-		totalFarmWeight = 0;
-		yearlyWeight = new HashMap<>();
+	public Farm(List<LogObject> farmData) {
+		this.ID = farmData.get(0).getID();
+		this.farmData = farmData;
+	}
+	
+	public double[][] getFarmYearData(String year) {
+		double[][] months = new double[12][2];
+		int yearWeight = 0;
+		for(int i = 0; i < months.length; i++) {
+			for(int n = 0; n < months[i].length; n++) {
+				months[i][n] = 0;
+			}
+		}
+		for(int i = 0; i < farmData.size(); i++) {
+			String farmDate = farmData.get(i).getDate();
+			String[] date = farmDate.split("-");
+			int month = Integer.parseInt(date[1]);
+			if(Integer.parseInt(farmDate.substring(0,4)) == Integer.parseInt(year)) {
+				months[month - 1][0] += Integer.parseInt(farmData.get(i).getWeight());
+				System.out.println(months[month - 1][0]);
+			}
+		}
+		for(int i = 0; i < months.length; i++) {
+			yearWeight += months[i][0];
+		}
+		System.out.println(yearWeight);
+		/*System.out.println(yearWeight);
+		for(int i = 0; i < months.length; i++) {
+			for(int j = 0; j < months[i].length; j++) {
+				System.out.print(months[i][j] + " ");
+			}
+			System.out.println();
+		}*/
+		for(int i = 0; i < 12; i++) {
+			months[i][1] = (months[i][0]/yearWeight) * 100;
+		}
+		return months;
 	}
 
-	public void setTotalFarmWeight(double totalFarmWeight) {
-		this.totalFarmWeight = totalFarmWeight;
-	}
-	
-	public double getTotalFarmWeight() {
-		totalFarmWeight=0;
-		for(int i=0;i<yearlyWeight.size();i++) {
-			if(yearlyWeight.get(i)!=null)
-				totalFarmWeight+=yearlyWeight.get(i).getTotalYearWeight();
-		}
-		return totalFarmWeight;
-	}
-	
-	public void setYearlyWeight(int year, double value) {
-		yearlyWeight.get(year).setTotalYearWeight(value);
-	}
-	
-	public double getYearlyWeight(int year) {
-		return this.yearlyWeight.get(year).getTotalYearWeight();
-	}
-	
-	public void setID(String ID) {
-		this.ID = ID;
-	}
-	
 	public String getID() {
-		return this.ID;
+		return ID;
 	}
-	
+
+	public void setID(String iD) {
+		ID = iD;
+	}
 }

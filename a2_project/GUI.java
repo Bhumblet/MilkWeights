@@ -262,7 +262,8 @@ public class GUI extends Application {
 		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				currentInfo = null;
-				files = null;
+				files.clear();
+				farmData.clear();
 				stage.setScene(SceneOne(stage));
 			}
 		};
@@ -272,13 +273,14 @@ public class GUI extends Application {
 				String yearString = yearFarm.getText();
 				try {
 					int yearInt = Integer.parseInt(yearString);
-					if(currentInfo.contains(farmString)) {
+					if(currentInfo.contains(farmString, yearString)) {
 						stage.setScene(farmReport(stage, farmString, yearString));
 					}
 					else {
 						farmError.setVisible(true);
 					}
 				} catch(Exception t) {
+					System.out.println(t);
 					farmError.setVisible(true);
 				}
 			}
@@ -328,6 +330,11 @@ public class GUI extends Application {
 	}
 	
 	private Scene farmReport(Stage stage, String farmID, String year) throws Exception {
+		Farm farmList = new Farm(currentInfo.getSpecificFarm(farmID));
+		double[][] data = farmList.getFarmYearData(year);
+		for(int i = 0; i < 12; i++) {
+			farmData.add(new farmTable(MONTHS[i], (int)data[i][0] + "", (double)Math.round((data[i][1] * 100)) / 100 + ""));
+		}
 		stage.setTitle(Title + "-Farm Report");
 		BorderPane start = new BorderPane();
 		start.setBackground(background);
@@ -374,7 +381,7 @@ public class GUI extends Application {
 	
 	private Scene modify(Stage stage) throws Exception {
 		currentInfo = new Driver(files);
-		List<LogObject> data = currentInfo.getModifyData();
+		List<LogObject> data = currentInfo.getModifyReport();
 		for(int i = 0; i < data.size(); i++) {
 			LogObject current = data.get(i);
 			String[] date = current.getDate().split("-");
@@ -512,18 +519,6 @@ public class GUI extends Application {
 	}
 	private final ObservableList<farmTable> farmData =
 	        FXCollections.observableArrayList(
-	            new farmTable("January", "996", "6.6"),
-	            new farmTable("February", "1375", "9.0"),
-	            new farmTable("March", "1131", "7.4"),
-	            new farmTable("April", "662", "4.4"),
-	            new farmTable("May", "1147", "7.6"),
-	            new farmTable("June", "1886", "12.4"),
-	            new farmTable("July", "1081", "7.1"),
-	            new farmTable("August", "1492", "9.8"),
-	            new farmTable("September", "768", "5.0"),
-	            new farmTable("October", "1593", "10.5"),
-	            new farmTable("November", "1346", "8.9"),
-	            new farmTable("December", "1713", "11.3")
 	        );
 	public static class farmTable {
 		 
