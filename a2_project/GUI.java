@@ -118,7 +118,7 @@ public class GUI extends Application {
 		Label selectFile = new Label("Select File(s)");
 		Label numberFiles = new Label("Number of Files: 0");
 		selectFile.setStyle("-fx-font-size: 14pt;");
-		saved.setTextFill(Color.GREEN);
+		saved.setTextFill(Color.DARKGREEN);
 		saved.setStyle("-fx-font-size: 14pt;");
 		saved.setVisible(false);
 		startLabel.setStyle("-fx-font-size: 22pt;");
