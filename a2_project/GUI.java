@@ -389,7 +389,7 @@ public class GUI extends Application {
 		Label label = new Label("Add/Edit/Remove");
 		Label saved = new Label("Saved!");
 		saved.setVisible(false);;
-		saved.setTextFill(Color.GREEN);
+		saved.setTextFill(Color.LIGHTGREEN);
 		label.setStyle("-fx-font-size: 22pt;");
 		Label file = new Label("File: " + currentInfo.getFileName());
 		file.setStyle("-fx-font-size: 12pt;");
