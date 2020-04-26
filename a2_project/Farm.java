@@ -36,7 +36,7 @@ import java.util.List;
 public class Farm {
 
 	private String ID;
-	private List<LogObject> farmData;
+	private List<LogObject> farmData; 
 	/**
 	 * @param args
 	 */
@@ -59,20 +59,11 @@ public class Farm {
 			int month = Integer.parseInt(date[1]);
 			if(Integer.parseInt(farmDate.substring(0,4)) == Integer.parseInt(year)) {
 				months[month - 1][0] += Integer.parseInt(farmData.get(i).getWeight());
-				System.out.println(months[month - 1][0]);
 			}
 		}
 		for(int i = 0; i < months.length; i++) {
 			yearWeight += months[i][0];
 		}
-		System.out.println(yearWeight);
-		/*System.out.println(yearWeight);
-		for(int i = 0; i < months.length; i++) {
-			for(int j = 0; j < months[i].length; j++) {
-				System.out.print(months[i][j] + " ");
-			}
-			System.out.println();
-		}*/
 		for(int i = 0; i < 12; i++) {
 			months[i][1] = (months[i][0]/yearWeight) * 100;
 		}

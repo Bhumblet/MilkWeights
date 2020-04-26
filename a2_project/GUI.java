@@ -125,7 +125,7 @@ public class GUI extends Application {
 		FileChooser file = new FileChooser();
 		file.setTitle("Open Milk Weight Data File");
 		Label filepath = new Label("Filepath:");
-		Label csvError = new Label("No File or invalid file type!");
+		Label csvError = new Label("No File/invalid file type/invalid file!");
 		csvError.setTextFill(Color.RED);
 		csvError.setVisible(false);
 		TextField textField = new TextField();
@@ -152,7 +152,7 @@ public class GUI extends Application {
 		center.setAlignment(Pos.CENTER.TOP_CENTER);
 		EventHandler<ActionEvent> browsweEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				files.add(file.showOpenDialog(stage));
+				files.addAll(file.showOpenMultipleDialog(stage));
 				String path = files.get(files.size() - 1).getAbsolutePath();
 				try {
 					if(!path.substring(path.length()-4).equals(".csv")) {
@@ -186,8 +186,8 @@ public class GUI extends Application {
 				try {
 					stage.setScene(sceneReport(stage));
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					files.clear();
+					csvError.setVisible(true);
 				}
 			}
 		};
@@ -196,8 +196,8 @@ public class GUI extends Application {
 				try {
 					stage.setScene(modify(stage));
 				} catch (Exception e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
+					files.clear();
+					csvError.setVisible(true);
 				}
 			}
 		};
@@ -280,7 +280,6 @@ public class GUI extends Application {
 						farmError.setVisible(true);
 					}
 				} catch(Exception t) {
-					System.out.println(t);
 					farmError.setVisible(true);
 				}
 			}
@@ -340,6 +339,8 @@ public class GUI extends Application {
 		start.setBackground(background);
 		start.setPadding(new Insets(20, 20, 20, 20));
 		Scene scene = new Scene(start, 900, 650);
+		Button reports = new Button("Reports");
+		reports.setStyle("-fx-font-size: 11pt;");
 		Label label = new Label("Farm Report");
 		label.setStyle("-fx-font-size: 22pt;");
 		Label farm = new Label("Farm ID: " + farmID + " Year: " + year);
@@ -354,21 +355,34 @@ public class GUI extends Application {
 	    table.getColumns().addAll(firstCol, secondCol, lastCol);
 	    table.setMaxWidth(752);
 	    firstCol.setCellValueFactory(
-	    	 new PropertyValueFactory<farmTable,String>("month")
+	    		new PropertyValueFactory<farmTable,String>("month")
 	    );
-	    	secondCol.setCellValueFactory(
-	    	    new PropertyValueFactory<farmTable,String>("milkWeight")
-	    	);
-	    	lastCol.setCellValueFactory(
+	    secondCol.setCellValueFactory(
+	    		new PropertyValueFactory<farmTable,String>("milkWeight")
+	    );
+	    lastCol.setCellValueFactory(
 	    	    new PropertyValueFactory<farmTable,String>("percentage")
-	    	);
+	    );
+	    EventHandler<ActionEvent> reportEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				try {
+					stage.setScene(sceneReport(stage));
+					farmData.clear();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		};
+	    reports.setOnAction(reportEvent);
 	    table.setItems(farmData);
 	    table.setEditable(true);
 	    table.setMaxHeight(330);
 		HBox top = new HBox();
 		VBox center = new VBox();
-		center.getChildren().addAll(farm, table);
+		center.getChildren().addAll(farm, table,reports);
 		center.setPrefWidth(600);
+		center.setSpacing(20);
 		center.setAlignment(Pos.TOP_CENTER);
 		top.getChildren().add(label);
 		top.setAlignment(Pos.CENTER_LEFT);
