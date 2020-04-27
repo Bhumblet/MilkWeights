@@ -32,36 +32,38 @@ package a2_project;
  */
 public class YearWeight {
 
-	private double totalYearWeight;
-	private MonthWeight[] monthlyWeight;
+	private String farmID;
+	private String weight;
 	
 	/**
 	 * @param args
 	 */
-	public YearWeight(double totalYearWeight) {
-		this.totalYearWeight = totalYearWeight;
-		monthlyWeight = new MonthWeight[12];
+	public YearWeight(String farmID, String weight) {
+		this.setFarmID(farmID);
+		this.setWeight(weight);
 	}
 
-	public void setTotalYearWeight(double totalYearWeight) {
-		this.totalYearWeight = totalYearWeight;
+	public String getFarmID() {
+		return farmID;
 	}
-	
-	public double getTotalYearWeight() {
-		totalYearWeight=0;
-		for(int i=0;i<monthlyWeight.length;i++) {
-			if(monthlyWeight[i]!=null)
-			totalYearWeight+=monthlyWeight[i].getTotalMonthWeight();
+
+	public void setFarmID(String farmID) {
+		this.farmID = farmID;
+	}
+
+	public String getWeight() {
+		return weight;
+	}
+
+	public void setWeight(String weight) {
+		this.weight = weight;
+	}
+
+	public boolean compare(YearWeight two) {
+		if(Integer.parseInt(this.getFarmID()) == Integer.parseInt(two.getFarmID())) {
+			return true;
 		}
-		return totalYearWeight;
-	}
-	
-	public void setMonthlyWeight(int index, double value) {
-		this.monthlyWeight[index] = new MonthWeight(value);
-	}
-	
-	public double getMonthlyWeight(int index) {
-		return this.monthlyWeight[index].getTotalMonthWeight();
+		return false;
 	}
 	
 }

@@ -233,18 +233,21 @@ public class GUI extends Application {
 		TextField yearFarm = new TextField();
 		yearFarm.setPrefWidth(100);
 		yearFarm.setPromptText("Year");
-		TextField year = new TextField();
+		TextField yearAnnual = new TextField();
 		TextField yearMonthly = new TextField();
 		yearMonthly.setPrefWidth(112);
-		year.setPrefWidth(240);
+		yearAnnual.setPrefWidth(240);
 		Label annualLabel = new Label("Year:");
 		Label monthlyLabel = new Label("Year:");
 		Label to = new Label("to");
 		Label dateLabel = new Label("Range:");
 		Label farmError = new Label("No matching ID/Year or invalid input!");
+		Label annualError = new Label("No matching Year or invalid input!");
 		farmError.setVisible(false);
 		farmError.setTextFill(Color.RED);
 		farmID.setPrefWidth(110);
+		annualError.setVisible(false);
+		annualError.setTextFill(Color.RED);
 		menu.setVisible(true);
 		COMBO_MONTHS.setPrefWidth(112);
 		Label label = new Label("Reports");
@@ -267,13 +270,30 @@ public class GUI extends Application {
 				stage.setScene(SceneOne(stage));
 			}
 		};
+		EventHandler<ActionEvent> annualEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				String year = yearAnnual.getText() ;
+				try {
+					int yearInt = Integer.parseInt(year);
+					if(currentInfo.containsYear(yearInt)) {
+						stage.setScene(annualReport(stage, yearInt));
+					}
+					else {
+						annualError.setVisible(true);
+					}
+				} catch(Exception t) {
+					annualError.setVisible(true);
+				}
+			}
+			
+		};
 		EventHandler<ActionEvent> farmEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				String farmString = farmID.getText();
 				String yearString = yearFarm.getText();
 				try {
 					int yearInt = Integer.parseInt(yearString);
-					if(currentInfo.contains(farmString, yearString)) {
+					if(currentInfo.containsFarm(farmString, yearString)) {
 						stage.setScene(farmReport(stage, farmString, yearString));
 					}
 					else {
@@ -284,6 +304,7 @@ public class GUI extends Application {
 				}
 			}
 		};
+		annualButton.setOnAction(annualEvent);
 		menu.setOnAction(menuEvent);
 		farmButton.setOnAction(farmEvent);
 		VBox farmRep = new VBox();
@@ -294,9 +315,9 @@ public class GUI extends Application {
 		farmRep.setSpacing(20);
 		VBox annualRep = new VBox();
 		HBox annual = new HBox();
-		annual.getChildren().addAll(annualLabel, year, annualButton);
+		annual.getChildren().addAll(annualLabel, yearAnnual, annualButton);
 		annual.setSpacing(10);
-		annualRep.getChildren().addAll(annualReport, annual);
+		annualRep.getChildren().addAll(annualReport, annual, annualError);
 		annualRep.setSpacing(20);
 		VBox monthlyRep = new VBox();
 		HBox monthly = new HBox();
@@ -324,6 +345,76 @@ public class GUI extends Application {
 		start.setTop(top);
 		start.setLeft(left);
 		start.setRight(right);
+		start.setBottom(bottom);
+		return scene;
+	}
+	
+	private Scene annualReport(Stage stage, int year) throws Exception {
+		List<YearWeight> list = currentInfo.getAnnualReport(year);
+		int totalWeight = 0;
+		for(int i = 0; i < list.size(); i++) {
+			totalWeight += Integer.parseInt(list.get(i).getWeight());
+		}
+		for(int i = 0; i < list.size(); i++) {
+			String weight = list.get(i).getWeight();
+			int weightInt = Integer.parseInt(weight);
+			System.out.println(totalWeight);
+			annualData.add(new annualTable(list.get(i).getFarmID(), weight, (double)(Math.round(((double)(Integer.parseInt(weight)) / totalWeight) * 10000)) / 100 + "" ));
+		}
+		stage.setTitle(Title + "-Annual Report");
+		BorderPane start = new BorderPane();
+		start.setBackground(background);
+		start.setPadding(new Insets(20, 20, 20, 20));
+		Scene scene = new Scene(start, 900, 650);
+		Button reports = new Button("Reports");
+		reports.setStyle("-fx-font-size: 11pt;");
+		Label label = new Label("Annual Report");
+		label.setStyle("-fx-font-size: 22pt;");
+		Label annual = new Label("Year: " + year);
+		annual.setStyle("-fx-font-size: 12pt;");
+		TableView table = new TableView();
+		TableColumn firstCol = new TableColumn("Farm");
+	    TableColumn secondCol = new TableColumn("Total Weight");
+	    TableColumn lastCol = new TableColumn("Year %");
+	    firstCol.setPrefWidth(250);
+	    secondCol.setPrefWidth(250);
+	    lastCol.setPrefWidth(250);
+	    firstCol.setSortable(false);
+	    lastCol.setSortable(false);
+	    table.getColumns().addAll(firstCol, secondCol, lastCol);
+	    table.setMaxWidth(770);
+	    firstCol.setCellValueFactory(
+	    		new PropertyValueFactory<farmTable,String>("farm")
+	    );
+	    secondCol.setCellValueFactory(
+	    		new PropertyValueFactory<farmTable,String>("weight")
+	    );
+	    lastCol.setCellValueFactory(
+	    	    new PropertyValueFactory<farmTable,String>("percentage")
+	    );
+	    EventHandler<ActionEvent> reportEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				try {
+					stage.setScene(sceneReport(stage));
+					annualData.clear();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		};
+	    reports.setOnAction(reportEvent);
+	    table.setItems(annualData);
+		HBox top = new HBox();
+		VBox center = new VBox();
+		center.getChildren().addAll(annual, table,reports);
+		center.setPrefWidth(600);
+		center.setSpacing(20);
+		center.setAlignment(Pos.TOP_CENTER);
+		top.getChildren().add(label);
+		top.setAlignment(Pos.CENTER_LEFT);
+		start.setTop(top);
+		start.setCenter(center);
 		start.setBottom(bottom);
 		return scene;
 	}
@@ -363,6 +454,7 @@ public class GUI extends Application {
 	    lastCol.setCellValueFactory(
 	    	    new PropertyValueFactory<farmTable,String>("percentage")
 	    );
+	    firstCol.setSortable(false);
 	    EventHandler<ActionEvent> reportEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				try {
@@ -376,7 +468,6 @@ public class GUI extends Application {
 		};
 	    reports.setOnAction(reportEvent);
 	    table.setItems(farmData);
-	    table.setEditable(true);
 	    table.setMaxHeight(330);
 		HBox top = new HBox();
 		VBox center = new VBox();
@@ -390,7 +481,6 @@ public class GUI extends Application {
 		start.setCenter(center);
 		start.setBottom(bottom);
 		return scene;
-		
 	}
 	
 	private Scene modify(Stage stage) throws Exception {
@@ -566,10 +656,51 @@ public class GUI extends Application {
             return percentage.get();
         }
  
-        public void setEmail(String percentage) {
+        public void setPercentage(String percentage) {
             this.percentage.set(percentage);
         }
     }
+	
+	private final ObservableList<annualTable> annualData =
+	        FXCollections.observableArrayList(
+	        );
+	public static class annualTable {
+		 
+        private final SimpleStringProperty farm;
+        private final SimpleStringProperty weight;
+        private final SimpleStringProperty percentage;
+ 
+        private annualTable(String farm, String weight, String percentage) {
+            this.farm = new SimpleStringProperty(farm);
+            this.weight= new SimpleStringProperty(weight);
+            this.percentage = new SimpleStringProperty(percentage);
+        }
+ 
+        public String getFarm() {
+            return farm.get();
+        }
+ 
+        public void setFarm(String farm) {
+            this.farm.set(farm);
+        }
+ 
+        public String getWeight() {
+            return weight.get();
+        }
+ 
+        public void setWeight(String weight) {
+            this.weight.set(weight);
+        }
+ 
+        public String getPercentage() {
+            return percentage.get();
+        }
+ 
+        public void setPercentage(String percentage) {
+            this.percentage.set(percentage);
+        }
+    }
+	
 	private final ObservableList<modifyTable> modifyData =
 	        FXCollections.observableArrayList(
 	            

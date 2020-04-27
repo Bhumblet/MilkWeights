@@ -75,7 +75,7 @@ public class Driver {
 		}
 	}
 	
-	public boolean contains(String ID, String year) {
+	public boolean containsFarm(String ID, String year) {
 		for(int i = 0; i < farmSorted.size(); i++) {
 			if(Integer.parseInt(farmSorted.get(i).get(0).getID()) == Integer.parseInt(ID)){
 				for(int n = 0; n < farmSorted.get(i).size(); n++) {
@@ -83,6 +83,18 @@ public class Driver {
 					if(Integer.parseInt(farm.substring(0,4)) == Integer.parseInt(year)){
 						return true;
 					}
+				}
+			}
+		}
+		return false;
+	}
+	
+	public boolean containsYear(int year) {
+		for(int i = 0; i < farmSorted.size(); i++) {
+			for(int n = 0; n < farmSorted.get(i).size(); n++) {
+				String farm = farmSorted.get(i).get(n).getDate();
+				if(Integer.parseInt(farm.substring(0,4)) == year) {
+					return true;
 				}
 			}
 		}
@@ -118,9 +130,6 @@ public class Driver {
 		scan.close();
 	}*/
 	
-	public List<String> exportData() {
-		return null;
-	}
 	public List<LogObject> getModifyReport(){
 		List<LogObject> list = new LinkedList<LogObject>();
 		for(int i = 0; i < farmSorted.size(); i++) {
@@ -139,12 +148,33 @@ public class Driver {
 		}
 		return null;	
 	}
-	public List<String> getFarmReport(){
-		return null;
-	}
 	
-	public List<String> getAnnualReport(){
-		return null;
+	public List<YearWeight> getAnnualReport(int year){
+		List<LogObject> list = new LinkedList<LogObject>();
+		for(int i = 0; i < farmSorted.size(); i++) {
+			for(int n = 0; n < farmSorted.get(i).size(); n++) {
+				String farm = farmSorted.get(i).get(n).getDate();
+				if(Integer.parseInt(farm.substring(0,4)) == year) {
+					list.add(farmSorted.get(i).get(n));
+				}
+			}
+		}
+		List<YearWeight> listSorted = new LinkedList<YearWeight>();
+		for(int i = 0; i < list.size(); i++) {
+			YearWeight current = new YearWeight(list.get(i).getID(), list.get(i).getWeight());
+			for(int n = 0; n < listSorted.size(); n++) {
+				if(listSorted.get(n).compare(current)) {
+					int listWeight = Integer.parseInt(listSorted.get(n).getWeight());
+					int currentWeight = Integer.parseInt(current.getWeight());
+					listSorted.get(n).setWeight((listWeight + currentWeight) + "");
+					current = null;
+				}
+			}
+			if(current != null) {
+				listSorted.add(current);
+			}
+		}
+		return listSorted;
 	}
 	
 	public List<String> getMonthlyReport(){
