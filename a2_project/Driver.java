@@ -100,6 +100,21 @@ public class Driver {
 		}
 		return false;
 	}
+	
+	public boolean containsMonth(int month, String year) {
+		for(int i = 0; i < farmSorted.size(); i++) {
+			for(int n = 0; n < farmSorted.get(i).size(); n++) {
+				String farm = farmSorted.get(i).get(n).getDate();
+				String[] farmSplit = farm.split("-");
+				String farmYear = farmSplit[0];
+				String farmMonth = farmSplit[1];
+				if(farmYear.equals(year) && farmMonth.equals(month + "")) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 	/*public void importData(String filepath) throws Exception {
 		if(!filepath.substring(filepath.length()-4).equals(".csv")) {
 			throw new Exception();
@@ -161,7 +176,7 @@ public class Driver {
 		}
 		List<YearWeight> listSorted = new LinkedList<YearWeight>();
 		for(int i = 0; i < list.size(); i++) {
-			YearWeight current = new YearWeight(list.get(i).getID(), list.get(i).getWeight());
+			YearWeight current = new YearWeight(list.get(i).getID(), list.get(i).getWeight(), list.get(i).getDate().substring(0, 4));
 			for(int n = 0; n < listSorted.size(); n++) {
 				if(listSorted.get(n).compare(current)) {
 					int listWeight = Integer.parseInt(listSorted.get(n).getWeight());
@@ -177,8 +192,35 @@ public class Driver {
 		return listSorted;
 	}
 	
-	public List<String> getMonthlyReport(){
-		return null;
+	public List<MonthWeight> getMonthlyReport(String year, String month)	{
+		List<LogObject> list = new LinkedList<LogObject>();
+		for(int i = 0; i < farmSorted.size(); i++) {
+			for(int n = 0; n < farmSorted.get(i).size(); n++) {
+				String farm = farmSorted.get(i).get(n).getDate();
+				String[] farmSplit = farm.split("-");
+				String yearFarm = farmSplit[0];
+				String monthFarm = farmSplit[1];
+				if(yearFarm.equals(year) && monthFarm.equals(month)) {
+					list.add(farmSorted.get(i).get(n));
+				}
+			}
+		}
+		List<MonthWeight> listSorted = new LinkedList<MonthWeight>();
+		for(int i = 0; i < list.size(); i++) {
+			MonthWeight current = new MonthWeight(list.get(i).getID(), list.get(i).getWeight());
+			for(int n = 0; n < listSorted.size(); n++) {
+				if(listSorted.get(n).compare(current)) {
+					int listWeight = Integer.parseInt(listSorted.get(n).getWeight());
+					int currentWeight = Integer.parseInt(current.getWeight());
+					listSorted.get(n).setWeight((listWeight + currentWeight) + "");
+					current = null;
+				}
+			}
+			if(current != null) {
+				listSorted.add(current);
+			}
+		}
+		return listSorted;
 	}
 	
 	public List<String> getDateRangeReport(){
@@ -188,12 +230,4 @@ public class Driver {
 	public String getFileName() {
 		return files.get(0).getName().toString();
 	}
-	/**
-	 * @param args
-	 */
-	public static void main(String[] args) {
-		
-
-	}
-
 }

@@ -34,13 +34,15 @@ public class YearWeight {
 
 	private String farmID;
 	private String weight;
+	private String year;
 	
 	/**
 	 * @param args
 	 */
-	public YearWeight(String farmID, String weight) {
+	public YearWeight(String farmID, String weight, String year) {
 		this.setFarmID(farmID);
 		this.setWeight(weight);
+		this.setYear(year);
 	}
 
 	public String getFarmID() {
@@ -64,6 +66,14 @@ public class YearWeight {
 			return true;
 		}
 		return false;
+	}
+
+	public String getYear() {
+		return year;
+	}
+
+	public void setYear(String year) {
+		this.year = year;
 	}
 	
 }

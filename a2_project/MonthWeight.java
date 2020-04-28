@@ -27,41 +27,40 @@ package a2_project;
 
 /**
  * MonthWeight - TODO Describe purpose of this user-defined type
+ * 
  * @author wirth (2020)
  *
  */
 public class MonthWeight {
 
-	 private double totalMonthWeight;
-	 private DayWeight[] dailyWeight;
-	
-	 public MonthWeight(double totalMonthWeight) {
-		 this.totalMonthWeight = totalMonthWeight;
-		 dailyWeight = new DayWeight[31];
-	 }
-	 
-	/**
-	 * @param args
-	 */
-	public void setTotalMonthWeight(double totalMonthWeight) {
-		this.totalMonthWeight = totalMonthWeight;
-	}
-	
-	public double getTotalMonthWeight() {
-		totalMonthWeight=0;
-		for(int i=0;i<dailyWeight.length;i++) {
-			if(dailyWeight[i]!=null)
-				totalMonthWeight+=dailyWeight[i].getTotalDayWeight();
-		}
-		return totalMonthWeight;
+	private String farmID;
+	private String weight;
+
+	public MonthWeight(String farmID, String weight) {
+		this.setFarmID(farmID);
+		this.setWeight(weight);
 	}
 
-	public void setDailyWeight(int index, double value) {
-		dailyWeight[index] = new DayWeight(value);
+	public String getFarmID() {
+		return farmID;
 	}
-	
-	public double getDailyWeight(int index) {
-		return dailyWeight[index].getTotalDayWeight();
+
+	public void setFarmID(String farmID) {
+		this.farmID = farmID;
 	}
-	
+
+	public String getWeight() {
+		return weight;
+	}
+
+	public void setWeight(String weight) {
+		this.weight = weight;
+	}
+
+	public boolean compare(MonthWeight two) {
+		if(Integer.parseInt(this.getFarmID()) == Integer.parseInt(two.getFarmID())) {
+			return true;
+		}
+		return false;
+	}
 }
