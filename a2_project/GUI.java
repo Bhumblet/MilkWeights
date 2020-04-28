@@ -1,26 +1,23 @@
 /**
- * HelloFX.java created by brock on Macbook Pro in a2
- *
+ * GUI.java created in a2_project
+ * 
  * Author:	 Brock Humblet (bhumblet@wisc.edu)
- * Date:	 4-19-20
+ * 			 John Wirth (jjwirth2@wisc.edu)
+ * 			 Shashank Bala (sbala2@wisc.edu)
+ * 			 Saurav Chandra (schandra8@wisc.edu)
+ * 			 Logan Kroes (lkroes@wisc.edu)
+ * 
+ * Date:	 Apr 19, 2020
  * 
  * Course:	 CS400
  * Semester: Spring 2020
- * Lecture:  001
- *
- * IDE:		 Eclipse IDE for Java Developers
- * Version:  2019-12 (4.14.0)
- * Build id: 20191212-1212
+ * Lecture:	 001
  * 
- * Device:	 Brock's Macbook Pro
- * OS:		 macOS Mojave
- * Version:	 10.14.6
- *
- * List Collaborators: Name, email@wisc.edu, lecture number
- *
- * Other Credits: describe other source (website or people)
- *
- * Known Bugs: None
+ * List Collaborators: none
+ * 
+ * Other Credits: none
+ * 
+ * Known Bugs: none
  */
 package a2_project;
 
@@ -79,6 +76,9 @@ public class GUI extends Application {
 	private Driver currentInfo;
 	private List<File> files = new LinkedList<File>();
 	
+	/**
+	 * 
+	 */
 	@Override
 	public void start(Stage stage) throws Exception {
 		Scene start = SceneOne(stage);
@@ -89,6 +89,9 @@ public class GUI extends Application {
 		stage.show();
 	}
 	
+	/**
+	 * 
+	 */
 	private Scene SceneOne(Stage stage) {
 		stage.setTitle(Title);
 		BorderPane start = new BorderPane();
@@ -211,6 +214,9 @@ public class GUI extends Application {
 		return scene;
 	}
 	
+	/**
+	 * 
+	 */
 	private Scene sceneReport(Stage stage) throws Exception {
 		currentInfo = new Driver(files);
 		stage.setTitle(Title + "-Reports");
@@ -375,6 +381,9 @@ public class GUI extends Application {
 		return scene;
 	}
 	
+	/**
+	 * 
+	 */
 	private Scene annualReport(Stage stage, int year) throws Exception {
 		List<YearWeight> list = currentInfo.getAnnualReport(year);
 		int totalWeight = 0;
@@ -444,6 +453,9 @@ public class GUI extends Application {
 		return scene;
 	}
 	
+	/**
+	 * 
+	 */
 	private Scene monthReport(Stage stage, int month, String year) throws Exception {
 		List<MonthWeight> list = currentInfo.getMonthlyReport(year, month + "");
 		int totalWeight = 0;
@@ -513,6 +525,9 @@ public class GUI extends Application {
 		return scene;
 	}
 	
+	/**
+	 * 
+	 */
 	private Scene farmReport(Stage stage, String farmID, String year) throws Exception {
 		Farm farmList = new Farm(currentInfo.getSpecificFarm(farmID));
 		double[][] data = farmList.getFarmYearData(year);
@@ -578,6 +593,9 @@ public class GUI extends Application {
 		return scene;
 	}
 	
+	/**
+	 * 
+	 */
 	private Scene modify(Stage stage) throws Exception {
 		currentInfo = new Driver(files);
 		List<LogObject> data = currentInfo.getModifyReport();
@@ -716,9 +734,15 @@ public class GUI extends Application {
 		return scene;
 		
 	}
+	
+	// 
 	private final ObservableList<farmTable> farmData =
 	        FXCollections.observableArrayList(
 	        );
+	
+	/**
+	 * 
+	 */
 	public static class farmTable {
 		 
         private final SimpleStringProperty month;
@@ -730,11 +754,11 @@ public class GUI extends Application {
             this.milkWeight = new SimpleStringProperty(milkweight);
             this.percentage = new SimpleStringProperty(percentage);
         }
- 
+
         public String getMonth() {
             return month.get();
         }
- 
+
         public void setMonth(String month) {
             this.month.set(month);
         }
@@ -756,9 +780,14 @@ public class GUI extends Application {
         }
     }
 	
+	// 
 	private final ObservableList<annualTable> annualData =
 	        FXCollections.observableArrayList(
 	        );
+	
+	/**
+	 * 
+	 */
 	public static class annualTable {
 		 
         private final SimpleStringProperty farm;
@@ -796,9 +825,14 @@ public class GUI extends Application {
         }
     }
 	
+	// 
 	private final ObservableList<monthTable> monthData =
 	        FXCollections.observableArrayList(
 	        );
+	
+	/**
+	 * 
+	 */
 	public static class monthTable {
 		 
         private final SimpleStringProperty farm;
@@ -836,10 +870,14 @@ public class GUI extends Application {
         }
     }
 	
+	// 
 	private final ObservableList<modifyTable> modifyData =
-	        FXCollections.observableArrayList(
-	            
+	        FXCollections.observableArrayList( 
 	        );
+	
+	/**
+	 * 
+	 */
 	public static class modifyTable {
 		 
         private final SimpleStringProperty date;

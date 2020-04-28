@@ -1,42 +1,33 @@
 /**
- * Driver.java created by johnw on Surface Pro 6 in a2_project
+ * Driver.java created in a2_project
  * 
- * Author:	 John Wirth (jjwirth2@wisc.edu)
+ * Author:	 Brock Humblet (bhumblet@wisc.edu)
+ * 			 John Wirth (jjwirth2@wisc.edu)
+ * 			 Shashank Bala (sbala2@wisc.edu)
+ * 			 Saurav Chandra (schandra8@wisc.edu)
+ * 			 Logan Kroes (lkroes@wisc.edu)
+ * 
  * Date:	 Apr 19, 2020
  * 
  * Course:	 CS400
  * Semester: Spring 2020
  * Lecture:	 001
  * 
- * IDE:		 Eclipse IDE for Java Developers
- * Version:	 2019-12 (4.14.0)
- * Build id: 20191212-1212
+ * List Collaborators: none
  * 
- * Device:	 J-Surface
- * OS:		 Windows 10 Home
- * Version:	 1903
- * OS Build: 18362.592
- *
- * List Collaborators: Name, email@wisc.edu, lecture number
+ * Other Credits: none
  * 
- * Other Credits: describe other sources (web sites or people)
- * 
- * Known Bugs: describe known unresolved bugs here
+ * Known Bugs: none
  */
 package a2_project;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
-import java.util.ArrayList;
-import java.util.Map.Entry;
 
 /**
- * Driver - TODO Describe purpose of this user-defined type
- * @author wirth (2020)
- *
+ * Driver - Class used to drive the rest of the program and GUI
  */
 public class Driver {
 
@@ -44,6 +35,9 @@ public class Driver {
 	private List<LinkedList<LogObject>> farmSorted;
 	private List<File> files;
 	
+	/**
+	 * 
+	 */
 	public Driver(List<File> files) throws Exception {
 		farmSorted = new LinkedList<LinkedList<LogObject>>();
 		this.files = files;
@@ -75,6 +69,9 @@ public class Driver {
 		}
 	}
 	
+	/**
+	 * 
+	 */
 	public boolean containsFarm(String ID, String year) {
 		for(int i = 0; i < farmSorted.size(); i++) {
 			if(Integer.parseInt(farmSorted.get(i).get(0).getID()) == Integer.parseInt(ID)){
@@ -89,6 +86,9 @@ public class Driver {
 		return false;
 	}
 	
+	/**
+	 * 
+	 */
 	public boolean containsYear(int year) {
 		for(int i = 0; i < farmSorted.size(); i++) {
 			for(int n = 0; n < farmSorted.get(i).size(); n++) {
@@ -101,6 +101,9 @@ public class Driver {
 		return false;
 	}
 	
+	/**
+	 * 
+	 */
 	public boolean containsMonth(int month, String year) {
 		for(int i = 0; i < farmSorted.size(); i++) {
 			for(int n = 0; n < farmSorted.get(i).size(); n++) {
@@ -145,6 +148,9 @@ public class Driver {
 		scan.close();
 	}*/
 	
+	/**
+	 * 
+	 */
 	public List<LogObject> getModifyReport(){
 		List<LogObject> list = new LinkedList<LogObject>();
 		for(int i = 0; i < farmSorted.size(); i++) {
@@ -155,6 +161,9 @@ public class Driver {
 		return list;
 	}
 	
+	/**
+	 * 
+	 */
 	public List<LogObject> getSpecificFarm(String ID){
 		for(int i = 0; i < farmSorted.size(); i++) {
 			if(farmSorted.get(i).get(0).getID().equals(ID)) {
@@ -164,6 +173,9 @@ public class Driver {
 		return null;	
 	}
 	
+	/**
+	 * 
+	 */
 	public List<YearWeight> getAnnualReport(int year){
 		List<LogObject> list = new LinkedList<LogObject>();
 		for(int i = 0; i < farmSorted.size(); i++) {
@@ -192,6 +204,9 @@ public class Driver {
 		return listSorted;
 	}
 	
+	/**
+	 * 
+	 */
 	public List<MonthWeight> getMonthlyReport(String year, String month)	{
 		List<LogObject> list = new LinkedList<LogObject>();
 		for(int i = 0; i < farmSorted.size(); i++) {
@@ -223,10 +238,16 @@ public class Driver {
 		return listSorted;
 	}
 	
+	/**
+	 * 
+	 */
 	public List<String> getDateRangeReport(){
 		return null;
 	}
 	
+	/**
+	 * 
+	 */
 	public String getFileName() {
 		return files.get(0).getName().toString();
 	}
