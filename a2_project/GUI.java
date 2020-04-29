@@ -157,9 +157,9 @@ public class GUI extends Application {
 		center.setAlignment(Pos.CENTER.TOP_CENTER);
 		EventHandler<ActionEvent> browsweEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				files.addAll(file.showOpenMultipleDialog(stage));
-				String path = files.get(files.size() - 1).getAbsolutePath();
 				try {
+					files.addAll(file.showOpenMultipleDialog(stage));
+					String path = files.get(files.size() - 1).getAbsolutePath();
 					if(!path.substring(path.length()-4).equals(".csv")) {
 						files.remove(files.size()-1);
 						throw new Exception();
