@@ -501,7 +501,7 @@ public class GUI extends Application {
 		Scene scene = new Scene(start, 900, 650);
 		Button reports = new Button("Reports");
 		reports.setStyle("-fx-font-size: 11pt;");
-		Label label = new Label("Annual Report");
+		Label label = new Label("Monthly Report");
 		label.setStyle("-fx-font-size: 22pt;");
 		Label monthly = new Label("Year: " + year);
 		monthly.setStyle("-fx-font-size: 12pt;");
@@ -573,7 +573,7 @@ public class GUI extends Application {
 		Scene scene = new Scene(start, 900, 650);
 		Button reports = new Button("Reports");
 		reports.setStyle("-fx-font-size: 11pt;");
-		Label label = new Label("Annual Report");
+		Label label = new Label("Date Range Report");
 		label.setStyle("-fx-font-size: 22pt;");
 		String[] dateOne = one.toString().split(" ");
 		String[] dateTwo = two.toString().split(" ");
