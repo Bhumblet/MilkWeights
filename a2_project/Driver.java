@@ -22,6 +22,9 @@
 package a2_project;
 
 import java.io.File;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Scanner;
@@ -118,35 +121,19 @@ public class Driver {
 		}
 		return false;
 	}
-	/*public void importData(String filepath) throws Exception {
-		if(!filepath.substring(filepath.length()-4).equals(".csv")) {
-			throw new Exception();
-		}
-		csv = new File(filepath);
-		Scanner scan=new Scanner(csv);
-		scan.useDelimiter(",");
-		while(scan.hasNext()) {
-			ArrayList<String> points=new ArrayList<String>();
-			points.add(scan.next());
-			if(points.size()==3) {
-				String year=points.get(0).substring(0,4);
-				String month=points.get(0).substring(5,5);
-				String day=points.get(0).substring(7,7);
-				String id=points.get(1).substring(5);
-				if(!data.containsKey(id))
-					data.put(id,new Farm(id));
-				double weight=Double.parseDouble(points.get(2));
-				Farm f=null;
-				for(Entry<String,Farm> entry:data.entrySet()) {
-					if(entry.getValue().getID().equals(id))
-						f=entry.getValue();
+	
+	public boolean containsDateRangeData(Date dateOne, Date dateTwo) throws ParseException {
+		for(int i = 0; i < farmSorted.size(); i++) {
+			for(int n = 0; n < farmSorted.get(i).size(); n++) {
+				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+				Date current = format.parse(farmSorted.get(i).get(n).getDate());
+				if(current.compareTo(dateOne) >= 0 && current.compareTo(dateTwo) <= 0) {
+					return true;
 				}
-				
-				data.replace(id,f);
 			}
 		}
-		scan.close();
-	}*/
+		return false;
+	}
 	
 	/**
 	 * 
@@ -239,10 +226,36 @@ public class Driver {
 	}
 	
 	/**
+	 * @throws ParseException 
 	 * 
 	 */
-	public List<String> getDateRangeReport(){
-		return null;
+	public List<DayWeight> getDateRangeReport(Date one, Date two) throws ParseException{
+		List<LogObject> list = new LinkedList<LogObject>();
+		for(int i = 0; i < farmSorted.size(); i++) {
+			for(int n = 0; n < farmSorted.get(i).size(); n++) {
+				SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd");
+				Date current = format.parse(farmSorted.get(i).get(n).getDate());
+				if(current.compareTo(one) >= 0 && current.compareTo(two) <= 0) {
+					list.add(farmSorted.get(i).get(n));
+				}
+			}
+		}
+		List<DayWeight> listSorted = new LinkedList<DayWeight>();
+		for(int i = 0; i < list.size(); i++) {
+			DayWeight current = new DayWeight(list.get(i).getID(), list.get(i).getWeight());
+			for(int n = 0; n < listSorted.size(); n++) {
+				if(listSorted.get(n).compare(current)) {
+					int listWeight = Integer.parseInt(listSorted.get(n).getWeight());
+					int currentWeight = Integer.parseInt(current.getWeight());
+					listSorted.get(n).setWeight((listWeight + currentWeight) + "");
+					current = null;
+				}
+			}
+			if(current != null) {
+				listSorted.add(current);
+			}
+		}
+		return listSorted;
 	}
 	
 	/**

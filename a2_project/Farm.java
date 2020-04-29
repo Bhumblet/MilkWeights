@@ -44,29 +44,32 @@ public class Farm {
 	}
 
 	/**
+	 * Creates a 2D array filled with each months weight and percentage
 	 * 
+	 * @param year - String value containing an actual year
 	 */
 	public double[][] getFarmYearData(String year) {
 		double[][] months = new double[12][2];
 		int yearWeight = 0;
 		for (int i = 0; i < months.length; i++) {
 			for (int n = 0; n < months[i].length; n++) {
-				months[i][n] = 0;
+				months[i][n] = 0; // Sets all values in array to 0
 			}
 		}
-		for (int i = 0; i < farmData.size(); i++) {
+		for (int i = 0; i < farmData.size(); i++) { // Loops through all data pertaining to farm
 			String farmDate = farmData.get(i).getDate();
 			String[] date = farmDate.split("-");
 			int month = Integer.parseInt(date[1]);
 			if (Integer.parseInt(farmDate.substring(0, 4)) == Integer.parseInt(year)) {
-				months[month - 1][0] += Integer.parseInt(farmData.get(i).getWeight());
+				months[month - 1][0] += Integer.parseInt(farmData.get(i).getWeight()); // Adds the weight to a specific
+																						// month if it should be there
 			}
 		}
 		for (int i = 0; i < months.length; i++) {
-			yearWeight += months[i][0];
+			yearWeight += months[i][0]; // Calculates total weight
 		}
 		for (int i = 0; i < 12; i++) {
-			months[i][1] = (months[i][0] / yearWeight) * 100;
+			months[i][1] = (months[i][0] / yearWeight) * 100; // Calculates percentages
 		}
 		return months;
 	}

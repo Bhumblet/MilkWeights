@@ -26,7 +26,10 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -117,6 +120,7 @@ public class GUI extends Application {
 		Label startLabel = new Label("Welcome");
 		Label saved = new Label("Saved!");
 		Label selectFile = new Label("Select File(s)");
+		Label directions = new Label("Only " +"\"Add/Edit/Remove\"" + " one file at a time.");
 		Label numberFiles = new Label("Number of Files: 0");
 		selectFile.setStyle("-fx-font-size: 14pt;");
 		saved.setTextFill(Color.DARKGREEN);
@@ -147,7 +151,7 @@ public class GUI extends Application {
 		right.getChildren().add(modify);
 		right.setAlignment(Pos.CENTER);
 		center.setSpacing(20);
-		center.getChildren().addAll(selectFile, mid, midTwo, csvError);
+		center.getChildren().addAll(selectFile, mid, directions, midTwo, csvError);
 		top.getChildren().add(startLabel);
 		top.setAlignment(Pos.CENTER_LEFT);
 		center.setAlignment(Pos.CENTER.TOP_CENTER);
@@ -248,6 +252,7 @@ public class GUI extends Application {
 		Label farmError = new Label("No matching ID/Year or invalid input!");
 		Label annualError = new Label("No matching Year or invalid input!");
 		Label monthError = new Label("No matching Month/Year or invalid input!");
+		Label rangeError = new Label("No info between dates or invalid input!");
 		ComboBox comboMonths = new ComboBox(FXCollections.observableArrayList(MONTHS));
 		farmError.setVisible(false);
 		farmError.setTextFill(Color.RED);
@@ -256,6 +261,8 @@ public class GUI extends Application {
 		annualError.setTextFill(Color.RED);
 		monthError.setVisible(false);
 		monthError.setTextFill(Color.RED);
+		rangeError.setVisible(false);
+		rangeError.setTextFill(Color.RED);
 		menu.setVisible(true);
 		comboMonths.setPrefWidth(112);
 		comboMonths.setPromptText("Month");
@@ -293,6 +300,25 @@ public class GUI extends Application {
 				} catch(Exception t) {
 					annualError.setVisible(true);
 				}
+			}
+			
+		};
+		EventHandler<ActionEvent> rangeEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				SimpleDateFormat format = new SimpleDateFormat("MM/dd/yyyy");
+				try {
+					Date one = format.parse(startDate.getEditor().getText());
+					Date two = format.parse(endDate.getEditor().getText());
+					if(currentInfo.containsDateRangeData(one, two)) {
+						stage.setScene(rangeReport(stage, one, two));
+					}
+					else {
+						rangeError.setVisible(true);
+					}
+				} catch (Exception e1) {
+					rangeError.setVisible(true);
+				}
+				
 			}
 			
 		};
@@ -335,6 +361,7 @@ public class GUI extends Application {
 				}
 			}
 		};
+		dateButton.setOnAction(rangeEvent);
 		monthlyButton.setOnAction(monthEvent);
 		annualButton.setOnAction(annualEvent);
 		menu.setOnAction(menuEvent);
@@ -361,7 +388,7 @@ public class GUI extends Application {
 		HBox date = new HBox();
 		date.getChildren().addAll(dateLabel, startDate, to, endDate, dateButton);
 		date.setSpacing(10);
-		dateRep.getChildren().addAll(dateReport, date);
+		dateRep.getChildren().addAll(dateReport, date, rangeError);
 		dateRep.setSpacing(20);
 		HBox top = new HBox();
 		VBox left = new VBox();
@@ -528,6 +555,82 @@ public class GUI extends Application {
 	/**
 	 * 
 	 */
+	private Scene rangeReport(Stage stage, Date one, Date two) throws Exception {
+		List<DayWeight> list = currentInfo.getDateRangeReport(one, two);
+		int totalWeight = 0;
+		for(int i = 0; i < list.size(); i++) {
+			totalWeight += Integer.parseInt(list.get(i).getWeight());
+		}
+		for(int i = 0; i < list.size(); i++) {
+			String weight = list.get(i).getWeight();
+			int weightInt = Integer.parseInt(weight);
+			rangeData.add(new rangeTable(list.get(i).getFarmID(), weight, (double)(Math.round(((double)(Integer.parseInt(weight)) / totalWeight) * 10000)) / 100 + "" ));
+		}
+		stage.setTitle(Title + "-Date Range Report");
+		BorderPane start = new BorderPane();
+		start.setBackground(background);
+		start.setPadding(new Insets(20, 20, 20, 20));
+		Scene scene = new Scene(start, 900, 650);
+		Button reports = new Button("Reports");
+		reports.setStyle("-fx-font-size: 11pt;");
+		Label label = new Label("Annual Report");
+		label.setStyle("-fx-font-size: 22pt;");
+		String[] dateOne = one.toString().split(" ");
+		String[] dateTwo = two.toString().split(" ");
+		String dateOneFormated = dateOne[0] + " " + dateOne[1] + " " + dateOne[2]+ " " + dateOne[5];
+		String dateTwoFormated = dateTwo[0] + " " + dateTwo[1] + " " + dateTwo[2]+ " " + dateTwo[5];
+		Label range = new Label(dateOneFormated + " to " + dateTwoFormated);
+		range.setStyle("-fx-font-size: 12pt;");
+		TableView table = new TableView();
+		TableColumn firstCol = new TableColumn("Farm");
+	    TableColumn secondCol = new TableColumn("Total Weight");
+	    TableColumn lastCol = new TableColumn("Year %");
+	    firstCol.setPrefWidth(250);
+	    secondCol.setPrefWidth(250);
+	    lastCol.setPrefWidth(250);
+	    firstCol.setSortable(false);
+	    lastCol.setSortable(false);
+	    table.getColumns().addAll(firstCol, secondCol, lastCol);
+	    table.setMaxWidth(770);
+	    firstCol.setCellValueFactory(
+	    		new PropertyValueFactory<farmTable,String>("farm")
+	    );
+	    secondCol.setCellValueFactory(
+	    		new PropertyValueFactory<farmTable,String>("weight")
+	    );
+	    lastCol.setCellValueFactory(
+	    	    new PropertyValueFactory<farmTable,String>("percentage")
+	    );
+	    EventHandler<ActionEvent> reportEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				try {
+					stage.setScene(sceneReport(stage));
+					rangeData.clear();
+				} catch (Exception e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+			}
+		};
+	    reports.setOnAction(reportEvent);
+	    table.setItems(rangeData);
+		HBox top = new HBox();
+		VBox center = new VBox();
+		center.getChildren().addAll(range, table,reports);
+		center.setPrefWidth(600);
+		center.setSpacing(20);
+		center.setAlignment(Pos.TOP_CENTER);
+		top.getChildren().add(label);
+		top.setAlignment(Pos.CENTER_LEFT);
+		start.setTop(top);
+		start.setCenter(center);
+		start.setBottom(bottom);
+		return scene;
+	}
+	
+	/**
+	 * 
+	 */
 	private Scene farmReport(Stage stage, String farmID, String year) throws Exception {
 		Farm farmList = new Farm(currentInfo.getSpecificFarm(farmID));
 		double[][] data = farmList.getFarmYearData(year);
@@ -669,7 +772,6 @@ public class GUI extends Application {
 				if(date.getValue() != null && !ID.getText().equals("") && !weight.getText().equals("")) {
 					error.setVisible(false);
 					String dateText = date.getEditor().getText();
-					//dateText = (dateText.substring(0, dateText.length()-4)) + dateText.substring(dateText.length()-2);
 					modifyData.add(new modifyTable(dateText,ID.getText(),weight.getText()));
 					date.setValue(null);
 					ID.clear();
@@ -869,6 +971,51 @@ public class GUI extends Application {
             this.percentage.set(percentage);
         }
     }
+	
+	// 
+		private final ObservableList<rangeTable> rangeData =
+		        FXCollections.observableArrayList(
+		        );
+		
+		/**
+		 * 
+		 */
+		public static class rangeTable {
+			 
+	        private final SimpleStringProperty farm;
+	        private final SimpleStringProperty weight;
+	        private final SimpleStringProperty percentage;
+	 
+	        private rangeTable(String farm, String weight, String percentage) {
+	            this.farm = new SimpleStringProperty(farm);
+	            this.weight= new SimpleStringProperty(weight);
+	            this.percentage = new SimpleStringProperty(percentage);
+	        }
+	 
+	        public String getFarm() {
+	            return farm.get();
+	        }
+	 
+	        public void setFarm(String farm) {
+	            this.farm.set(farm);
+	        }
+	 
+	        public String getWeight() {
+	            return weight.get();
+	        }
+	 
+	        public void setWeight(String weight) {
+	            this.weight.set(weight);
+	        }
+	 
+	        public String getPercentage() {
+	            return percentage.get();
+	        }
+	 
+	        public void setPercentage(String percentage) {
+	            this.percentage.set(percentage);
+	        }
+	    }
 	
 	// 
 	private final ObservableList<modifyTable> modifyData =
