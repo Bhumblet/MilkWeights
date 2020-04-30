@@ -566,7 +566,7 @@ public class GUI extends Application {
 		Scene scene = new Scene(start, 900, 650);
 		Button reports = new Button("Reports");
 		Label label = new Label("Monthly Report");
-		Label monthly = new Label("Year: " + year);
+		Label monthly = new Label("Month: " + MONTHS[month - 1] + " Year: " + year);
 		TableView table = new TableView();
 		TableColumn firstCol = new TableColumn("Farm");
 		TableColumn secondCol = new TableColumn("Total Weight");
