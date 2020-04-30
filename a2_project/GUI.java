@@ -473,7 +473,7 @@ public class GUI extends Application {
 		}
 		for (int i = 0; i < list.size(); i++) {
 			String weight = list.get(i).getWeight();
-			annualData.add(new annualTable(list.get(i).getFarmID(), weight,
+			tableData.add(new dataTable(list.get(i).getFarmID(), weight,
 					(double) (Math.round(((double) (Integer.parseInt(weight)) / totalWeight) * 10000)) / 100 + ""));
 		}
 
@@ -509,7 +509,7 @@ public class GUI extends Application {
 		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farm"));
 		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
 		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("percentage"));
-		table.setItems(annualData);
+		table.setItems(tableData);
 
 		// Event Handling
 		// Event for report button
@@ -517,7 +517,7 @@ public class GUI extends Application {
 			public void handle(ActionEvent e) {
 				try {
 					stage.setScene(sceneReport(stage));
-					annualData.clear();
+					tableData.clear();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -557,7 +557,7 @@ public class GUI extends Application {
 		}
 		for (int i = 0; i < list.size(); i++) { // Adds the data to table
 			String weight = list.get(i).getWeight();
-			monthData.add(new monthTable(list.get(i).getFarmID(), weight,
+			tableData.add(new dataTable(list.get(i).getFarmID(), weight,
 					(double) (Math.round(((double) (Integer.parseInt(weight)) / totalWeight) * 10000)) / 100 + ""));
 		}
 
@@ -593,7 +593,7 @@ public class GUI extends Application {
 		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farm"));
 		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
 		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("percentage"));
-		table.setItems(monthData);
+		table.setItems(tableData);
 
 		// Event handling
 		// Event for report button
@@ -601,7 +601,7 @@ public class GUI extends Application {
 			public void handle(ActionEvent e) {
 				try {
 					stage.setScene(sceneReport(stage)); // returns to reports scene
-					monthData.clear();
+					tableData.clear();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -641,7 +641,7 @@ public class GUI extends Application {
 		}
 		for (int i = 0; i < list.size(); i++) {
 			String weight = list.get(i).getWeight();
-			rangeData.add(new rangeTable(list.get(i).getFarmID(), weight,
+			tableData.add(new dataTable(list.get(i).getFarmID(), weight,
 					(double) (Math.round(((double) (Integer.parseInt(weight)) / totalWeight) * 10000)) / 100 + ""));
 		}
 
@@ -683,7 +683,7 @@ public class GUI extends Application {
 		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farm"));
 		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
 		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("percentage"));
-		table.setItems(rangeData);
+		table.setItems(tableData);
 
 		// Event handling
 		// Event for report button
@@ -691,7 +691,7 @@ public class GUI extends Application {
 			public void handle(ActionEvent e) {
 				try {
 					stage.setScene(sceneReport(stage)); // returns to report scene
-					rangeData.clear();
+					tableData.clear();
 				} catch (Exception e1) {
 					// TODO Auto-generated catch block
 					e1.printStackTrace();
@@ -805,7 +805,7 @@ public class GUI extends Application {
 	 */
 	private Scene modify(Stage stage) throws Exception {
 		currentInfo = new Driver(files);
-		
+
 		// Gets the data from the driver class and formats it into the table
 		List<LogObject> data = currentInfo.getModifyReport();
 		for (int i = 0; i < data.size(); i++) {
@@ -814,70 +814,83 @@ public class GUI extends Application {
 			String dateFormated = date[1] + "/" + date[2] + "/" + date[0];
 			modifyData.add(new modifyTable(dateFormated, current.getID(), current.getWeight()));
 		}
-		
+
 		// Create JavaFX controls
 		BorderPane start = new BorderPane();
-		
-		stage.setTitle(Title + "-Modify");
-		
-		start.setBackground(background);
-		start.setPadding(new Insets(20, 20, 20, 20));
 		Scene scene = new Scene(start, 900, 650);
 		Label label = new Label("Add/Edit/Remove");
 		Label saved = new Label("Saved!");
-		saved.setVisible(false);
-		;
-		saved.setTextFill(Color.LIGHTGREEN);
-		label.setStyle("-fx-font-size: 22pt;");
 		Label file = new Label("File: " + currentInfo.getFileName());
-		file.setStyle("-fx-font-size: 12pt;");
-		menu.setVisible(true);
-		save.setVisible(true);
-		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
-			public void handle(ActionEvent e) {
-				currentInfo = null;
-				files.clear();
-				modifyData.clear();
-				stage.setScene(SceneOne(stage));
-			}
-		};
-		menu.setOnAction(menuEvent);
+		Label error = new Label("No input or invalid input!");
 		TableView<modifyTable> table = new TableView<modifyTable>();
 		TableColumn firstCol = new TableColumn("Date");
 		TableColumn secondCol = new TableColumn("Farm ID");
 		TableColumn lastCol = new TableColumn("Weight");
+		DatePicker date = new DatePicker();
+		Button add = new Button("Add");
+		Button remove = new Button("Remove");
+		TextField ID = new TextField();
+		TextField weight = new TextField();
+		HBox top = new HBox();
+		HBox mod = new HBox();
+
+		// Moidfying JavaFX Controls
+		menu.setVisible(true);
+		save.setVisible(true);
+		stage.setTitle(Title + "-Modify");
+		start.setBackground(background);
+		start.setPadding(new Insets(20, 20, 20, 20));
+		saved.setVisible(false);
+		saved.setTextFill(Color.LIGHTGREEN);
+		label.setStyle("-fx-font-size: 22pt;");
+		file.setStyle("-fx-font-size: 12pt;");
 		firstCol.setPrefWidth(250);
 		secondCol.setPrefWidth(250);
 		lastCol.setPrefWidth(250);
-		table.getColumns().addAll(firstCol, secondCol, lastCol);
 		table.setEditable(true);
 		table.setMaxWidth(770);
 		firstCol.setSortable(false);
 		secondCol.setSortable(false);
 		lastCol.setSortable(false);
+		date.setPromptText("Date");
+		ID.setPromptText("Farm ID");
+		error.setTextFill(Color.RED);
+		error.setVisible(false);
+		weight.setPromptText("Weight");
+		add.setPrefWidth(101);
+		remove.setPrefWidth(101);
+
+		// Modifying table
+		table.getColumns().addAll(firstCol, secondCol, lastCol);
 		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("date"));
 		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farmID"));
 		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
 		table.setItems(modifyData);
-		DatePicker date = new DatePicker();
-		date.setPromptText("Date");
-		TextField ID = new TextField();
-		ID.setPromptText("Farm ID");
-		TextField weight = new TextField();
-		Label error = new Label("No input or invalid input!");
-		error.setTextFill(Color.RED);
-		error.setVisible(false);
-		weight.setPromptText("Weight");
-		Button add = new Button("Add");
-		Button remove = new Button("Remove");
-		add.setPrefWidth(101);
-		remove.setPrefWidth(101);
+		firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
+		lastCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
+		// Event Handling
+		// Event for menu button
+		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
+			public void handle(ActionEvent e) {
+				currentInfo = null;
+				files.clear();
+				modifyData.clear();
+				stage.setScene(SceneOne(stage)); // returns to start scene
+			}
+		};
+
+		// Event for add button
 		EventHandler<ActionEvent> addEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
-				if (date.getValue() != null && !ID.getText().equals("") && !weight.getText().equals("")) {
+				if (date.getValue() != null && !ID.getText().equals("") && !weight.getText().equals("")) { // if data
+																											// fields
+																											// aren't
+																											// blank
 					error.setVisible(false);
 					String dateText = date.getEditor().getText();
-					modifyData.add(new modifyTable(dateText, ID.getText(), weight.getText()));
+					modifyData.add(new modifyTable(dateText, ID.getText(), weight.getText())); // add new data
 					date.setValue(null);
 					ID.clear();
 					weight.clear();
@@ -886,12 +899,16 @@ public class GUI extends Application {
 				}
 			}
 		};
+
+		// Event for remove button
 		EventHandler<ActionEvent> removeEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				modifyTable selected = table.getSelectionModel().getSelectedItem();
-				table.getItems().remove(selected);
+				table.getItems().remove(selected); // remove selected item
 			}
 		};
+
+		// Event for save button
 		EventHandler<ActionEvent> saveEvent = new EventHandler<ActionEvent>() {
 			public void handle(ActionEvent e) {
 				File file = files.get(0);
@@ -902,7 +919,7 @@ public class GUI extends Application {
 					FileWriter writer = new FileWriter(file.getAbsoluteFile(), false);
 					BufferedWriter bWriter = new BufferedWriter(writer);
 					bWriter.write("date,farm_id,weight");
-					for (int i = 0; i < modifyData.size(); i++) {
+					for (int i = 0; i < modifyData.size(); i++) { // Writes each item to file
 						bWriter.newLine();
 						String[] date = modifyData.get(i).getDate().split("/");
 						String ID = modifyData.get(i).getFarmID();
@@ -911,20 +928,21 @@ public class GUI extends Application {
 						bWriter.write(dateFormat + ",Farm " + ID + "," + weight);
 					}
 					bWriter.close();
+					writer.close();
 					saved.setVisible(true);
 				} catch (IOException e1) {
 					e1.printStackTrace();
 				}
 			}
 		};
-		firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
-		lastCol.setCellFactory(TextFieldTableCell.forTableColumn());
+
+		// Button triggers
+		menu.setOnAction(menuEvent);
 		save.setOnAction(saveEvent);
 		remove.setOnAction(removeEvent);
 		add.setOnAction(addEvent);
-		HBox top = new HBox();
-		HBox mod = new HBox();
+
+		// Formating layout
 		mod.getChildren().addAll(date, ID, weight, add, remove);
 		mod.setSpacing(10);
 		mod.setAlignment(Pos.CENTER);
@@ -935,6 +953,8 @@ public class GUI extends Application {
 		center.setSpacing(20);
 		top.getChildren().add(label);
 		top.setAlignment(Pos.CENTER_LEFT);
+
+		// Set BorderPane arguments
 		start.setTop(top);
 		start.setCenter(center);
 		start.setBottom(bottom);
@@ -942,11 +962,15 @@ public class GUI extends Application {
 
 	}
 
-	//
+	// Data for farm table
 	private final ObservableList<farmTable> farmData = FXCollections.observableArrayList();
+	// Data for modify table
+	private final ObservableList<modifyTable> modifyData = FXCollections.observableArrayList();
+	// Data for range table
+	private final ObservableList<dataTable> tableData = FXCollections.observableArrayList();
 
 	/**
-	 * 
+	 * This class creates a table for the farm report
 	 */
 	public static class farmTable {
 
@@ -954,171 +978,153 @@ public class GUI extends Application {
 		private final SimpleStringProperty milkWeight;
 		private final SimpleStringProperty percentage;
 
+		/**
+		 * Constructor for farm table
+		 * 
+		 * @param month      - String containing month
+		 * @param milkweight - String containing weight
+		 * @param percentage - String containing percentage
+		 */
 		private farmTable(String month, String milkweight, String percentage) {
 			this.month = new SimpleStringProperty(month);
 			this.milkWeight = new SimpleStringProperty(milkweight);
 			this.percentage = new SimpleStringProperty(percentage);
 		}
 
+		/**
+		 * Gets the month
+		 * 
+		 * @return - month
+		 */
 		public String getMonth() {
 			return month.get();
 		}
 
+		/**
+		 * Sets the month
+		 * 
+		 * @param month - String month
+		 */
 		public void setMonth(String month) {
 			this.month.set(month);
 		}
 
+		/**
+		 * Gets the weight
+		 * 
+		 * @return - weight
+		 */
 		public String getMilkWeight() {
 			return milkWeight.get();
 		}
 
+		/**
+		 * Sets the weight
+		 * 
+		 * @param milkWeight - String weight
+		 */
 		public void setMilkWeight(String milkWeight) {
 			this.milkWeight.set(milkWeight);
 		}
 
+		/**
+		 * Gets the percentage
+		 * 
+		 * @return - percentage
+		 */
 		public String getPercentage() {
 			return percentage.get();
 		}
 
+		/**
+		 * Sets the percentage
+		 * 
+		 * @param percentage - String percentage
+		 */
 		public void setPercentage(String percentage) {
 			this.percentage.set(percentage);
 		}
 	}
 
-	//
-	private final ObservableList<annualTable> annualData = FXCollections.observableArrayList();
-
 	/**
-	 * 
+	 * This class creates a table for the annual report
 	 */
-	public static class annualTable {
+	public static class dataTable {
 
 		private final SimpleStringProperty farm;
 		private final SimpleStringProperty weight;
 		private final SimpleStringProperty percentage;
 
-		private annualTable(String farm, String weight, String percentage) {
+		/**
+		 * Constructor for annual table
+		 * 
+		 * @param farm       - String containing farm id
+		 * @param weight     - String containing weight
+		 * @param percentage - String containing percentage
+		 */
+		private dataTable(String farm, String weight, String percentage) {
 			this.farm = new SimpleStringProperty(farm);
 			this.weight = new SimpleStringProperty(weight);
 			this.percentage = new SimpleStringProperty(percentage);
 		}
 
+		/**
+		 * Gets farmID
+		 * 
+		 * @return - farmID
+		 */
 		public String getFarm() {
 			return farm.get();
 		}
 
+		/**
+		 * Sets farmID
+		 * 
+		 * @param farm - String id
+		 */
 		public void setFarm(String farm) {
 			this.farm.set(farm);
 		}
 
+		/**
+		 * Gets weight
+		 * 
+		 * @return - weight
+		 */
 		public String getWeight() {
 			return weight.get();
 		}
 
+		/**
+		 * Sets weight
+		 * 
+		 * @param weight - String weight
+		 */
 		public void setWeight(String weight) {
 			this.weight.set(weight);
 		}
 
+		/**
+		 * Gets percentage
+		 * 
+		 * @return - percentage
+		 */
 		public String getPercentage() {
 			return percentage.get();
 		}
 
+		/**
+		 * Sets percentage
+		 * 
+		 * @param percentage - String percentage
+		 */
 		public void setPercentage(String percentage) {
 			this.percentage.set(percentage);
 		}
 	}
 
-	//
-	private final ObservableList<monthTable> monthData = FXCollections.observableArrayList();
-
 	/**
-	 * 
-	 */
-	public static class monthTable {
-
-		private final SimpleStringProperty farm;
-		private final SimpleStringProperty weight;
-		private final SimpleStringProperty percentage;
-
-		private monthTable(String farm, String weight, String percentage) {
-			this.farm = new SimpleStringProperty(farm);
-			this.weight = new SimpleStringProperty(weight);
-			this.percentage = new SimpleStringProperty(percentage);
-		}
-
-		public String getFarm() {
-			return farm.get();
-		}
-
-		public void setFarm(String farm) {
-			this.farm.set(farm);
-		}
-
-		public String getWeight() {
-			return weight.get();
-		}
-
-		public void setWeight(String weight) {
-			this.weight.set(weight);
-		}
-
-		public String getPercentage() {
-			return percentage.get();
-		}
-
-		public void setPercentage(String percentage) {
-			this.percentage.set(percentage);
-		}
-	}
-
-	//
-	private final ObservableList<rangeTable> rangeData = FXCollections.observableArrayList();
-
-	/**
-	 * 
-	 */
-	public static class rangeTable {
-
-		private final SimpleStringProperty farm;
-		private final SimpleStringProperty weight;
-		private final SimpleStringProperty percentage;
-
-		private rangeTable(String farm, String weight, String percentage) {
-			this.farm = new SimpleStringProperty(farm);
-			this.weight = new SimpleStringProperty(weight);
-			this.percentage = new SimpleStringProperty(percentage);
-		}
-
-		public String getFarm() {
-			return farm.get();
-		}
-
-		public void setFarm(String farm) {
-			this.farm.set(farm);
-		}
-
-		public String getWeight() {
-			return weight.get();
-		}
-
-		public void setWeight(String weight) {
-			this.weight.set(weight);
-		}
-
-		public String getPercentage() {
-			return percentage.get();
-		}
-
-		public void setPercentage(String percentage) {
-			this.percentage.set(percentage);
-		}
-	}
-
-	//
-	private final ObservableList<modifyTable> modifyData = FXCollections.observableArrayList();
-
-	/**
-	 * 
+	 * This class creates a table for modification
 	 */
 	public static class modifyTable {
 
@@ -1126,32 +1132,69 @@ public class GUI extends Application {
 		private final SimpleStringProperty farmID;
 		private final SimpleStringProperty weight;
 
+		/**
+		 * Constructor for modify table
+		 * 
+		 * @param date   - String containing date
+		 * @param farmID - String containing farmID
+		 * @param weight - String containing weight
+		 */
 		public modifyTable(String date, String farmID, String weight) {
 			this.date = new SimpleStringProperty(date);
 			this.farmID = new SimpleStringProperty(farmID);
 			this.weight = new SimpleStringProperty(weight);
 		}
 
+		/**
+		 * Gets the date
+		 * 
+		 * @return - date
+		 */
 		public String getDate() {
 			return date.get();
 		}
 
+		/**
+		 * Sets the date
+		 * 
+		 * @param date - String date
+		 */
 		public void setDate(String date) {
 			this.date.set(date);
 		}
 
+		/**
+		 * Gets the id
+		 * 
+		 * @return - id
+		 */
 		public String getFarmID() {
 			return farmID.get();
 		}
 
+		/**
+		 * Sets the id
+		 * 
+		 * @param farmID - String id
+		 */
 		public void setFarmID(String farmID) {
 			this.farmID.set(farmID);
 		}
 
+		/**
+		 * Gets the weight
+		 * 
+		 * @return - weight
+		 */
 		public String getWeight() {
 			return weight.get();
 		}
 
+		/**
+		 * Sets the weight
+		 * 
+		 * @param weight - String weight
+		 */
 		public void setWeight(String weight) {
 			this.weight.set(weight);
 		}
