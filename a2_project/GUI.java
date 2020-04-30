@@ -506,9 +506,9 @@ public class GUI extends Application {
 
 		// Modifying Table
 		table.getColumns().addAll(firstCol, secondCol, lastCol);
-		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farm"));
-		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
-		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("percentage"));
+		firstCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("farm"));
+		secondCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("weight"));
+		lastCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("percentage"));
 		table.setItems(tableData);
 
 		// Event Handling
@@ -590,9 +590,9 @@ public class GUI extends Application {
 
 		// Modifying table
 		table.getColumns().addAll(firstCol, secondCol, lastCol);
-		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farm"));
-		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
-		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("percentage"));
+		firstCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("farm"));
+		secondCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("weight"));
+		lastCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("percentage"));
 		table.setItems(tableData);
 
 		// Event handling
@@ -680,9 +680,9 @@ public class GUI extends Application {
 
 		// Modifying table
 		table.getColumns().addAll(firstCol, secondCol, lastCol);
-		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farm"));
-		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
-		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("percentage"));
+		firstCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("farm"));
+		secondCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("weight"));
+		lastCol.setCellValueFactory(new PropertyValueFactory<dataTable, String>("percentage"));
 		table.setItems(tableData);
 
 		// Event handling
@@ -862,14 +862,14 @@ public class GUI extends Application {
 
 		// Modifying table
 		table.getColumns().addAll(firstCol, secondCol, lastCol);
-		firstCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("date"));
-		secondCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("farmID"));
-		lastCol.setCellValueFactory(new PropertyValueFactory<farmTable, String>("weight"));
+		firstCol.setCellValueFactory(new PropertyValueFactory<modifyTable, String>("date"));
+		secondCol.setCellValueFactory(new PropertyValueFactory<modifyTable, String>("farmID"));
+		lastCol.setCellValueFactory(new PropertyValueFactory<modifyTable, String>("weight"));
 		table.setItems(modifyData);
 		firstCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		secondCol.setCellFactory(TextFieldTableCell.forTableColumn());
 		lastCol.setCellFactory(TextFieldTableCell.forTableColumn());
-
+		
 		// Event Handling
 		// Event for menu button
 		EventHandler<ActionEvent> menuEvent = new EventHandler<ActionEvent>() {
